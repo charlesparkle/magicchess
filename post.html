@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Loading... | MCGG Network</title>
+    <meta property="og:type"        content="article">
+    <meta property="og:site_name"   content="MCGG Network">
+    <meta property="og:title"       content="MCGG Network">
+    <meta property="og:description" content="Community hub for Magic Chess: Go Go players.">
+    <meta name="twitter:card"       content="summary_large_image">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="tokens.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="post.css">
+</head>
+<body class="page page--community page--post">
+    <div id="ambient-system" aria-hidden="true">
+        <div class="noise-overlay"></div>
+        <div class="blob blob--primary"></div>
+        <div class="blob blob--secondary"></div>
+    </div>
+    <div class="app-shell">
+        <aside class="sidebar" role="navigation" aria-label="Side Navigation">
+            <a href="index.html" class="sidebar__logo" aria-label="Go to Home">
+                <div class="sidebar__logo-icon"><i class="ph-fill ph-hexagon"></i></div>
+            </a>
+            <nav class="sidebar__nav">
+                <ul class="sidebar__list">
+                    <li class="sidebar__item">
+                        <a href="builder.html" class="sidebar__link" title="Lineup Builder">
+                            <i class="ph-bold ph-wrench"></i>
+                            <span class="sidebar__label">Builder</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="app.html" class="sidebar__link sidebar__link--active" title="Community Hub">
+                            <i class="ph-bold ph-users-three"></i>
+                            <span class="sidebar__label">Community</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="#" class="sidebar__link" title="Meta Tier List">
+                            <i class="ph-bold ph-chart-line-up"></i>
+                            <span class="sidebar__label">Meta</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="#" class="sidebar__link" title="Tournament Brackets">
+                            <i class="ph-bold ph-trophy"></i>
+                            <span class="sidebar__label">Tourney</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar__footer">
+                <button class="sidebar__action" aria-label="Settings"><i class="ph-bold ph-gear"></i></button>
+                <button id="sidebar-logout-btn" hidden aria-label="Logout"><i class="ph-bold ph-sign-out"></i></button>
+                <button id="sidebar-login-btn" aria-label="Login">
+                    <i class="ph-bold ph-sign-in"></i>
+                    <span>Login</span>
+                </button>
+                <div class="sidebar__user">
+                    <img src="https://ui-avatars.com/api/?name=Guest&background=27272a&color=71717a" alt="User Profile" class="sidebar__avatar">
+                </div>
+            </div>
+        </aside>
+        <main class="main-content main-content--post" id="main-content">
+            <header class="content-header content-header--post">
+                <a href="app.html" class="back-btn" aria-label="Kembali ke Community Hub">
+                    <i class="ph-bold ph-arrow-left"></i>
+                    <span>Community Hub</span>
+                </a>
+                <nav class="breadcrumb" aria-label="Breadcrumb" id="post-breadcrumb">
+                    <span class="breadcrumb__item">Community</span>
+                    <i class="ph-bold ph-caret-right breadcrumb__sep"></i>
+                    <span class="breadcrumb__item breadcrumb__item--active" id="breadcrumb-category">memuat...</span>
+                </nav>
+            </header>
+            <div class="post-layout">
+                <article class="post-article" id="post-content" aria-live="polite">
+                    <div class="post-state post-state--loading" id="state-loading">
+                        <div class="loading-bar-wrap">
+                            <div class="loading-bar" id="loading-bar"></div>
+                        </div>
+                        <div class="skeleton skeleton--title"></div>
+                        <div class="skeleton skeleton--meta"></div>
+                        <div class="skeleton skeleton--author"></div>
+                        <div class="skeleton skeleton--body"></div>
+                        <div class="skeleton skeleton--body"></div>
+                        <div class="skeleton skeleton--body skeleton--short"></div>
+                        <div class="skeleton skeleton--body"></div>
+                        <div class="skeleton skeleton--body skeleton--short"></div>
+                    </div>
+                    <div class="post-state post-state--error" id="state-error" hidden>
+                        <i class="ph-duotone ph-warning-circle"></i>
+                        <h2>Postingan tidak ditemukan</h2>
+                        <p id="error-message">Postingan ini mungkin sudah dihapus atau link-nya salah.</p>
+                        <a href="app.html" class="btn btn--primary">Kembali ke Feed</a>
+                    </div>
+                    <div id="state-loaded" hidden>
+                        <div class="article-meta">
+                            <span class="article-tag" id="article-tag">—</span>
+                            <span class="article-time" id="article-time">—</span>
+                        </div>
+                        <h1 class="article-title" id="article-title">—</h1>
+                        <div class="author-bar glass-panel">
+                            <div class="author-bar__avatar" id="author-avatar">—</div>
+                            <div class="author-bar__info">
+                                <span class="author-bar__name" id="author-name">—</span>
+                                <span class="author-bar__rank" id="author-rank"></span>
+                            </div>
+                            <div class="author-bar__actions">
+                                <button class="vote-btn" id="vote-btn" aria-label="Upvote">
+                                    <i class="ph-bold ph-arrow-fat-up"></i>
+                                    <span id="vote-count">0</span>
+                                </button>
+                                <button class="share-btn" id="share-btn" aria-label="Bagikan">
+                                    <i class="ph-bold ph-share-network"></i>
+                                    <span>Bagikan</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="article-body" id="article-body"></div>
+                        <hr class="article-divider">
+                        <section class="comments-section" aria-label="Komentar">
+                            <h2 class="comments-title">
+                                <i class="ph-bold ph-chat-circle"></i>
+                                Komentar (<span id="comment-count">0</span>)
+                                <span class="realtime-badge" id="realtime-indicator">
+                                    <span class="rt-dot"></span>Live
+                                </span>
+                            </h2>
+                            <div class="comment-form glass-panel">
+                                <div class="comment-form__avatar">CK</div>
+                                <div class="comment-form__input-wrap">
+                                    <textarea id="comment-input" class="comment-form__input" placeholder="Tulis komentar kamu..." rows="1" aria-label="Tulis komentar" maxlength="1000"></textarea>
+                                    <div class="comment-form__footer">
+                                        <span class="comment-form__char-count" id="char-count">0/1000</span>
+                                        <button class="btn btn--primary btn--sm" id="submit-comment" disabled>
+                                            <i class="ph-bold ph-paper-plane-tilt"></i> Kirim
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment-list" id="comment-list"></div>
+                            <div class="comments-loading" id="comments-loading">
+                                <div class="skeleton skeleton--comment"></div>
+                                <div class="skeleton skeleton--comment"></div>
+                            </div>
+                            <div class="comments-empty" id="comments-empty" hidden>
+                                <i class="ph-duotone ph-chats"></i>
+                                <p>Belum ada komentar. Jadilah yang pertama!</p>
+                            </div>
+                        </section>
+                    </div>
+                </article>
+                <aside class="post-sidebar" aria-label="Related content">
+                    <section class="widget glass-panel" id="author-widget">
+                        <header class="widget__header">
+                            <h3 class="widget__title">Tentang Penulis</h3>
+                        </header>
+                        <div class="author-widget__body">
+                            <div class="author-widget__avatar" id="sidebar-author-avatar">—</div>
+                            <div class="author-widget__name" id="sidebar-author-name">—</div>
+                            <div class="author-widget__rank" id="sidebar-author-rank">—</div>
+                        </div>
+                    </section>
+                    <section class="widget glass-panel">
+                        <header class="widget__header">
+                            <h3 class="widget__title">Postingan Terkait</h3>
+                        </header>
+                        <div class="related-list" id="related-list"></div>
+                    </section>
+                </aside>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="post.js"></script>
+</body>
+</html>

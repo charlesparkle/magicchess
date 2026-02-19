@@ -1,0 +1,67 @@
+/**
+ * MCGG NETWORK — DESIGN TOKENS (Single Source of Truth)
+ *
+ * Include this file ONCE at the top of each page's stylesheet chain,
+ * before style.css / builder.css / app.css. All three files reference
+ * these variables rather than re-declaring them.
+ *
+ * HTML usage (in <head>, before other CSS):
+ *   <link rel="stylesheet" href="tokens.css">
+ *   <link rel="stylesheet" href="style.css">   <!-- or builder.css / app.css -->
+ */
+
+:root {
+  /* ── Brand Palette ──────────────────────────────────────── */
+  --clr-primary:        #6366f1;   /* Indigo 500 */
+  --clr-primary-glow:   rgba(99, 102, 241, 0.4);
+  --clr-primary-subtle: rgba(99, 102, 241, 0.1);
+  --clr-secondary:      #a855f7;   /* Purple 500 */
+  --clr-accent:         #06b6d4;   /* Cyan 500 */
+  --clr-gold:           #eab308;   /* Yellow 500 */
+  --clr-danger:         #ef4444;   /* Red 500 */
+  --clr-success:        #22c55e;   /* Green 500 */
+
+  /* ── Surface & Background ───────────────────────────────── */
+  --bg-body:        #020202;
+  --bg-surface:     #0f0f0f;
+  --bg-card:        rgba(255, 255, 255, 0.03);
+  --panel-bg:       rgba(15, 15, 15, 0.7);
+
+  /* ── Glassmorphism System ───────────────────────────────── */
+  --glass-surface:  rgba(255, 255, 255, 0.03);
+  --glass-bg:       rgba(20, 20, 20, 0.7);
+  --glass-border:   rgba(255, 255, 255, 0.08);
+  --glass-border-1: 1px solid rgba(255, 255, 255, 0.08); /* shorthand for border property */
+  --glass-shadow:   0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --glass-blur:     blur(32px);
+
+  /* Builder-specific zone tints (used in builder.css) */
+  --clr-enemy:          rgba(239, 68, 68, 0.08);
+  --clr-enemy-border:   rgba(239, 68, 68, 0.18);
+  --clr-player:         rgba(99, 102, 241, 0.06);
+  --clr-player-border:  rgba(99, 102, 241, 0.16);
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --text-main:   #ffffff;
+  --text-muted:  #94a3b8;
+  --text-dark:   #0f172a;
+  --text-dim:    #71717a;
+  --font-sans:   'Plus Jakarta Sans', sans-serif;
+  --font-mono:   'JetBrains Mono', 'Space Grotesk', monospace;
+
+  /* ── Layout ─────────────────────────────────────────────── */
+  --sidebar-width:    84px;
+  --header-height:    90px;
+  --container-width:  1280px;
+  --cell-size:        clamp(48px, 5.4vw, 62px);
+
+  /* ── Spacing & Radius ───────────────────────────────────── */
+  --radius-sm:  8px;
+  --radius-md:  16px;
+  --radius-lg:  32px;
+
+  /* ── Animation Easing ───────────────────────────────────── */
+  --anim-ios:       cubic-bezier(0.4, 0, 0.2, 1);
+  --anim-bounce:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo:  cubic-bezier(0.19, 1, 0.22, 1);
+}
