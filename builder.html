@@ -11,55 +11,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="builder.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        /* 1. Paksa panel kiri memunculkan scrollbar */
-        .panel--left { 
-            min-height: 0 !important; 
-        }
-
-        /* 2. Paksa grid menjadi 3 kolom lega dan beri jarak (gap) yang luas */
-        .hero-grid {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 14px !important; 
-            padding: 14px !important;
-            align-content: start !important;
-            min-height: 0 !important;
-            overflow-y: auto !important;
-        }
-
-        /* 3. Paksa tinggi kartu mengikuti isi, BUKAN melar ketarik ke bawah */
-        .hero-card {
-            display: block !important;
-            height: max-content !important;
-            border-radius: 12px !important;
-            margin: 0 !important;
-        }
-
-        /* 4. KUNCI UTAMA: Paksa wadah gambar menjadi KOTAK SEMPURNA (1:1) */
-        .hero-card__img-wrap {
-            width: 100% !important;
-            aspect-ratio: 1 / 1 !important;
-            padding-top: 0 !important; 
-            position: relative !important;
-            overflow: hidden !important;
-        }
-
-        /* 5. Paksa gambar memotong rapi tanpa ngerusak proporsi karakter */
-        .hero-card__img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            position: absolute !important;
-            top: 0 !important; left: 0 !important;
-        }
-        
-        /* 6. Besarkan teks sedikit agar terbaca jelas */
-        .hero-card__name {
-            font-size: 11px !important;
-            padding-top: 4px !important;
-        }
-    </style>
 </head>
 <body class="page page--builder">
 
@@ -216,7 +167,7 @@
                             </div>
                             <p class="gl-hint">Jika hero terpilih ada di board, +1 poin Glory League ditambahkan.</p>
                         </div>
-                        <div class="meow-status glass-panel" id="meow-indicator">
+                        <div class="meow-status" id="meow-indicator">
                             <div class="meow-status__icon">🐱</div>
                             <div class="meow-status__info">
                                 <span class="meow-status__title">Mystic Meow</span>
