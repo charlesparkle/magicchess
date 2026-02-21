@@ -326,9 +326,7 @@ function updateSynergies() {
   const activeTypeCount = Object.entries(tp).filter(([name, raw]) =>
     name === 'Mortal Rival' ? mortalActive : Math.floor(raw / 2) * 2 >= 2
   ).length;
-  const meowActive = activeTypeCount >= 9;
   renderSynergyDisplay(tp, mortalActive);
-  renderMeowIndicator(meowActive, activeTypeCount);
   renderHeaderStats(unique.length, playerHeroes.reduce((s, h) => s + h.cost, 0));
   encodeToURL();
 }
@@ -394,15 +392,6 @@ function renderSynergyDisplay(tp, mortalActive) {
         
       el.appendChild(row);
     });
-}
-
-function renderMeowIndicator(meowActive, activeTypeCount) {
-  const el = document.getElementById('meow-indicator');
-  if (!el) return;
-  el.classList.toggle('meow-status--active', meowActive);
-  el.querySelector('.meow-status__desc').textContent = meowActive
-    ? 'AKTIF ✦ +15% All Damage'
-    : `${activeTypeCount}/9 tipe trait aktif`;
 }
 
 function renderHeaderStats(playerUniqueCount, totalGold) {
