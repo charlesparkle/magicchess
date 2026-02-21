@@ -612,21 +612,6 @@ body.page--post {
 
 
 /* ── FAB: Profile (kanan atas, desktop hidden, mobile visible saat login) ───── */
-#fab-profile {
-    display: none; /* diatur JS */
-    position: fixed;
-    top: 16px; right: 16px;
-    z-index: 1000;
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    padding: 0;
-    background: rgba(10,10,12,0.85);
-    border: 2px solid var(--clr-primary);
-    box-shadow: 0 4px 20px rgba(99,102,241,0.4);
-    cursor: pointer;
-    overflow: hidden;
-    transition: transform 0.2s var(--anim-bounce), box-shadow 0.2s;
-}
 #fab-profile[hidden] { display: none !important; }
 #fab-profile:hover   { transform: scale(1.08); box-shadow: 0 6px 28px rgba(99,102,241,0.55); }
 #fab-profile:active  { transform: scale(0.92); }
@@ -635,22 +620,22 @@ body.page--post {
 }
 
 /* ── FAB: Create Post pensil (kiri bawah, mobile only) ──────────────────────── */
-#fab-create-post {
-    display: none; 
-    position: fixed;
-    bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-    right: 20px; /* [UPDATE] Pindah ke kanan agar mudah ditekan jempol */
-    z-index: 310;
-    width: 52px; height: 52px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--clr-primary), var(--clr-secondary));
-    border: none;
-    box-shadow: 0 6px 24px rgba(99,102,241,0.5), 0 2px 8px rgba(0,0,0,0.4);
-    color: #fff; font-size: 22px;
-    cursor: pointer;
-    align-items: center; justify-content: center;
-    transition: transform 0.25s var(--anim-bounce), box-shadow 0.2s;
-}
+#fab-create-post { display: flex; min-width: 52px; min-height: 52px; }
+    
+    /* Perbaikan Letak Profil di Mobile */
+    #fab-profile { 
+        display: flex; 
+        min-width: 42px; 
+        min-height: 42px;
+        /* Turunkan otomatis sejajar dengan header dan hindari kamera depan (notch) */
+        top: calc(14px + env(safe-area-inset-top, 0px));
+        right: 20px;
+    }
+
+    /* Mencegah judul "Community Hub" tertabrak foto profil yang melayang */
+    .content-header__title-group { 
+        padding-right: 56px; 
+    }
 
 #fab-create-post:hover  { transform: scale(1.08) translateY(-2px); box-shadow: 0 10px 32px rgba(99,102,241,0.6); }
 #fab-create-post:active { transform: scale(0.91); }
@@ -848,4 +833,5 @@ body.page--post {
     }
     .cp-textarea { font-size: 16px; /* Mencegah Auto-Zoom di iOS Safari */ }
 }
+
 
