@@ -437,6 +437,27 @@ body.page--builder {
 .gl-select option { background: #111; color: #fff; }
 .gl-hint { font-size: 9px; color: #52525b; line-height: 1.5; margin-top: 4px; }
 
+.meow-status {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; flex-shrink: 0;
+    opacity: 0.5; transition: opacity 0.4s, border-color 0.4s, background 0.4s;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+}
+.meow-status--active {
+    opacity: 1;
+    border-color: var(--clr-primary) !important;
+    background: rgba(99,102,241,0.08);
+}
+.meow-status__icon {
+    font-size: 20px; width: 40px; height: 40px;
+    background: rgba(99,102,241,0.1); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.meow-status__title { display: block; font-size: 13px; font-weight: 800; }
+.meow-status__desc  { font-size: 10px; color: #71717a; display: block; margin-top: 2px; }
+
 .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 7px;
     padding: 9px 18px; border-radius: 10px;
@@ -529,6 +550,7 @@ body.page--builder {
     }
     .hero-card {
         max-width: 80px;
+        max-width: 88px;
         justify-self: center;
     }
     .hero-card__name {
@@ -539,6 +561,7 @@ body.page--builder {
     .arena__board { transform: rotateX(0deg) !important; }
     .hero-token   { transform: none !important; }
     :root { --cell-size: clamp(44px, 13.2vw, 62px); }
+    :root { --cell-size: clamp(42px, 12.8vw, 60px); }
 
     /* ── Bottom Nav Container ─────────────────────────────────── */
 .sidebar {
@@ -711,6 +734,8 @@ body.page--builder {
     }
 }
 
+@media (max-width: 520px) {
+    .hero-grid { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 520px) {
     .hero-grid { grid-template-columns: repeat(3, 1fr); }
 }
