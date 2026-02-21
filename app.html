@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Community Hub | MCGG Network</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="tokens.css">
+    <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="app.css">
+</head>
+<body class="page page--community">
+
+    <div id="ambient-system" aria-hidden="true">
+        <div class="noise-overlay"></div>
+        <div class="blob blob--primary"></div>
+        <div class="blob blob--secondary"></div>
+    </div>
+
+    <div class="app-shell">
+
+        <aside class="sidebar" role="navigation" aria-label="Side Navigation">
+            <a href="index.html" class="sidebar__logo" aria-label="Go to Home">
+                <div class="sidebar__logo-icon"><i class="ph-fill ph-hexagon"></i></div>
+            </a>
+            <nav class="sidebar__nav">
+                <ul class="sidebar__list">
+                    <li class="sidebar__item">
+                        <a href="builder.html" class="sidebar__link" title="Lineup Builder">
+                            <i class="ph-bold ph-wrench"></i>
+                            <span class="sidebar__label">Builder</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="app.html" class="sidebar__link sidebar__link--active" title="Community Hub">
+                            <i class="ph-bold ph-users-three"></i>
+                            <span class="sidebar__label">Community</span>
+                            <span class="sidebar__badge" aria-label="5 new notifications">5</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="#" class="sidebar__link" title="Meta Tier List">
+                            <i class="ph-bold ph-chart-line-up"></i>
+                            <span class="sidebar__label">Meta</span>
+                        </a>
+                    </li>
+                    <li class="sidebar__item">
+                        <a href="#" class="sidebar__link" title="Tournament Brackets">
+                            <i class="ph-bold ph-trophy"></i>
+                            <span class="sidebar__label">Tourney</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar__footer">
+                <button class="sidebar__action" aria-label="Settings"><i class="ph-bold ph-gear"></i></button>
+                <button id="sidebar-logout-btn" hidden aria-label="Logout"><i class="ph-bold ph-sign-out"></i></button>
+                <button id="sidebar-login-btn" aria-label="Login">
+                    <i class="ph-bold ph-sign-in"></i>
+                    <span>Login</span>
+                </button>
+                <div class="sidebar__user">
+                    <img src="https://ui-avatars.com/api/?name=Guest&background=27272a&color=71717a" alt="User Profile" class="sidebar__avatar">
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content" id="main-content">
+
+            <header class="content-header">
+                <div class="content-header__title-group">
+                    <h1 class="content-header__title">Community Hub</h1>
+                    <p class="content-header__subtitle">Trending discussions and global meta insights</p>
+                </div>
+                <div class="content-header__actions">
+                    <div class="search-field">
+                        <i class="ph-bold ph-magnifying-glass"></i>
+                        <input type="text" placeholder="Search discussions..." aria-label="Search forum">
+                    </div>
+                    <button class="btn btn--primary icon-left" id="open-create-post">
+                        <i class="ph-bold ph-plus"></i>
+                        <span>Create Post</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="layout-grid">
+
+                <section class="feed" aria-label="Discussion Feed">
+                    <nav class="feed__filters" aria-label="Feed category">
+                        <div class="feed__tabs">
+                            <button class="feed__filter feed__filter--active" data-tab="recent">Recent</button>
+                            <button class="feed__filter" data-tab="news">
+                                <i class="ph-bold ph-newspaper"></i> News
+                            </button>
+                        </div>
+                        <div class="feed__sort-wrap">
+                            <select class="feed__sort" id="feed-sort" aria-label="Urutkan">
+                                <option value="new">🕐 Terbaru</option>
+                                <option value="top">⭐ Terpopuler</option>
+                                <option value="hot">🔥 Hot</option>
+                                <option value="following">👥 Diikuti</option>
+                            </select>
+                        </div>
+                    </nav>
+                    <div class="feed__container custom-scroll"></div>
+                </section>
+
+                <aside class="side-panel" aria-label="Community Statistics">
+                    <section class="widget widget--live glass-panel">
+                        <header class="widget__header">
+                            <h3 class="widget__title">Live Tournament</h3>
+                            <span class="status-indicator"></span>
+                        </header>
+                        <div class="widget__content">
+                            <h4 class="tournament-name">Rising Star S2</h4>
+                            <p class="tournament-match">Grand Finals: Team ONIC vs RRQ</p>
+                            <div class="tournament-timer">
+                                <div class="timer-unit"><span id="timer-h">02</span><small>h</small></div>
+                                <div class="timer-unit"><span id="timer-m">45</span><small>m</small></div>
+                                <div class="timer-unit"><span id="timer-s">12</span><small>s</small></div>
+                            </div>
+                            <button class="btn btn--white btn--block">Watch Live</button>
+                        </div>
+                    </section>
+                    <section class="widget glass-panel">
+                        <header class="widget__header">
+                            <h3 class="widget__title">Global Rankings</h3>
+                        </header>
+                        <div class="leaderboard">
+                            <div class="leaderboard__row">
+                                <span class="leaderboard__rank">1</span>
+                                <span class="leaderboard__name">R7 Tatsumaki</span>
+                                <span class="leaderboard__pts">2450</span>
+                            </div>
+                            <div class="leaderboard__row">
+                                <span class="leaderboard__rank">2</span>
+                                <span class="leaderboard__name">Lemon</span>
+                                <span class="leaderboard__pts">2410</span>
+                            </div>
+                            <div class="leaderboard__row">
+                                <span class="leaderboard__rank">3</span>
+                                <span class="leaderboard__name">Kairi</span>
+                                <span class="leaderboard__pts">2380</span>
+                            </div>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <!-- ── MODAL: Create Post (Composer) ────────────────────────── -->
+    <div id="create-post-modal" class="cp-overlay" role="dialog" aria-modal="true" aria-label="Buat Postingan" hidden>
+        <div class="cp-composer">
+
+            <!-- Header: avatar + name + close -->
+            <div class="cp-head">
+                <div class="cp-head__identity">
+                    <div class="cp-avatar" id="cp-avatar"></div>
+                    <div class="cp-head__meta">
+                        <span class="cp-head__name" id="cp-username-label">—</span>
+                        <span class="cp-head__sub">posting ke komunitas</span>
+                    </div>
+                </div>
+                <button class="cp-close" id="cp-close" aria-label="Tutup"><i class="ph-bold ph-x"></i></button>
+            </div>
+
+            <!-- Category pills -->
+            <div class="cp-cats" id="cp-cats">
+                <span class="cp-cats__label">Kategori</span>
+                <button type="button" class="cp-cat" data-category="guide" data-tag="Guide">
+                    <i class="ph-bold ph-book-open"></i> Guide
+                </button>
+                <button type="button" class="cp-cat" data-category="meta" data-tag="Meta Discussion">
+                    <i class="ph-bold ph-chart-line-up"></i> Meta
+                </button>
+                <button type="button" class="cp-cat cp-cat--news-only" data-category="news" data-tag="News" style="display:none">
+                    <i class="ph-bold ph-newspaper"></i> News
+                </button>
+                <span class="cp-cat-err" id="cp-error-category" hidden>← pilih dulu</span>
+            </div>
+
+            <!-- Scrollable body: compose view OR preview view -->
+            <div class="cp-body" id="cp-body-wrap">
+
+                <!-- COMPOSE -->
+                <div id="cp-compose-view">
+                    <textarea
+                        id="cp-text"
+                        class="cp-textarea"
+                        placeholder="Tulis postinganmu… share strategi, meta, guide, diskusi seru seputar Magic Chess 🎮"
+                        maxlength="5000"
+                    ></textarea>
+                    <p class="cp-text-err" id="cp-error-text" hidden>Tulis minimal 10 karakter dulu.</p>
+
+                    <!-- Attachment toolbar -->
+                    <div class="cp-toolbar">
+                        <label class="cp-tool" title="Gambar (JPG/PNG/GIF/WEBP, maks 10 MB)">
+                            <input type="file" id="cp-img-input" accept="image/jpeg,image/png,image/gif,image/webp,image/avif" multiple hidden>
+                            <i class="ph-bold ph-image"></i>
+                        </label>
+                        <label class="cp-tool" title="Video (MP4/WEBM, maks 100 MB)">
+                            <input type="file" id="cp-vid-input" accept="video/mp4,video/webm,video/ogg" hidden>
+                            <i class="ph-bold ph-video-camera"></i>
+                        </label>
+                        <label class="cp-tool" title="PDF (maks 20 MB)">
+                            <input type="file" id="cp-pdf-input" accept="application/pdf" hidden>
+                            <i class="ph-bold ph-file-pdf"></i>
+                        </label>
+                        <button type="button" class="cp-tool" id="cp-link-toggle" title="Lampirkan link">
+                            <i class="ph-bold ph-link"></i>
+                        </button>
+                        <span class="cp-toolbar__sep"></span>
+                        <span class="cp-char-count" id="cp-char-count">0 / 5000</span>
+                    </div>
+
+                    <!-- Link input (hidden by default) -->
+                    <div class="cp-link-wrap" id="cp-link-wrap" hidden>
+                        <i class="ph-bold ph-link"></i>
+                        <input type="url" id="cp-link-input" placeholder="https://..." autocomplete="off">
+                        <button type="button" id="cp-link-clear" aria-label="Hapus"><i class="ph-bold ph-x"></i></button>
+                    </div>
+                    <p class="cp-link-err" id="cp-link-err" hidden></p>
+
+                    <!-- Media thumbnails -->
+                    <div class="cp-media-row" id="cp-media-row"></div>
+                </div>
+
+                <!-- PREVIEW -->
+                <div id="cp-preview-view" hidden>
+                    <p class="cp-preview-label"><i class="ph-bold ph-eye"></i> Tampilan di feed</p>
+                    <div id="cp-preview-card"></div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="cp-foot">
+                <button class="cp-preview-btn" id="cp-preview-toggle">
+                    <i class="ph-bold ph-eye" id="cp-preview-icon"></i>
+                    <span id="cp-preview-btn-label">Preview</span>
+                </button>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="btn btn--ghost" id="cp-cancel">Batal</button>
+                    <button class="btn btn--primary" id="cp-submit">
+                        <i class="ph-bold ph-paper-plane-tilt"></i> Posting
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+
+    <!-- FAB: Profile — kanan atas, muncul di mobile saat login -->
+    <button id="fab-profile" aria-label="Profil saya">
+        <img src="https://ui-avatars.com/api/?name=Guest&background=27272a&color=71717a"
+             alt="Avatar" id="fab-profile-img">
+    </button>
+
+    <!-- FAB: Create Post pensil — kiri bawah, muncul di mobile -->
+    <button id="fab-create-post" aria-label="Buat postingan">
+        <i class="ph-bold ph-pencil-simple"></i>
+    </button>
+</body>
+</html>

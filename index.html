@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <title>MCGG Network | The Ultimate Magic Chess Ecosystem</title>
+    <meta name="description" content="Join the #1 Magic Chess community. Build pro lineups, analyze real-time meta, participate in tournaments, and connect with top players.">
+    <meta name="keywords" content="Magic Chess, Mobile Legends, Lineup Builder, Meta Tier List, Esports Tournament, MCGG">
+    <meta name="author" content="MCGG Network">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mcgg.net/">
+    <meta property="og:title" content="MCGG Network - Craft Your Victory">
+    <meta property="og:description" content="The most advanced analytics and community hub for Magic Chess players.">
+    <meta property="og:image" content="https://mcgg.net/assets/og-image.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+
+    <link rel="stylesheet" href="tokens.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="page">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="loader" id="loader" aria-hidden="true">
+        <div class="loader__content">
+            <div class="loader__logo">MCGG<span class="text-accent">.NET</span></div>
+            <div class="loader__bar">
+                <div class="loader__progress"></div>
+            </div>
+            <p class="loader__text">Initializing Ecosystem...</p>
+        </div>
+    </div>
+
+    <div class="ambient-bg" aria-hidden="true">
+        <div class="ambient-bg__noise"></div>
+        <div class="ambient-bg__blob ambient-bg__blob--1"></div>
+        <div class="ambient-bg__blob ambient-bg__blob--2"></div>
+        <div class="ambient-bg__grid"></div>
+    </div>
+
+    <header class="header">
+        <div class="header__container">
+            <a href="index.html" class="header__logo" aria-label="MCGG Home">
+                <div class="header__logo-icon">
+                    <i class="ph-fill ph-hexagon"></i>
+                </div>
+                <span class="header__logo-text">MCGG</span>
+            </a>
+
+            <nav class="nav" aria-label="Main Navigation">
+                <ul class="nav__list">
+                    <li class="nav__item"><a href="#hero" class="nav__link active">Home</a></li>
+                    <li class="nav__item"><a href="#services" class="nav__link">Features</a></li>
+                    <li class="nav__item"><a href="#portfolio" class="nav__link">Meta Builds</a></li>
+                    <li class="nav__item"><a href="app.html?view=community" class="nav__link">Community Hub</a></li>
+                </ul>
+            </nav>
+
+            <div class="header__actions">
+                <a href="#contact" class="btn btn--secondary btn--sm">
+                    <span>Login</span>
+                </a>
+                <a href="app.html" class="btn btn--primary btn--sm icon-right" aria-label="Open App Dashboard">
+                    <span>Launch App</span>
+                    <i class="ph-bold ph-arrow-right"></i>
+                </a>
+                <button class="header__toggle" aria-label="Toggle Menu" aria-expanded="false" aria-controls="mobile-menu">
+                    <i class="ph-bold ph-list"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <section id="hero" class="hero section">
+            <div class="container hero__container">
+                <div class="hero__content">
+                    <div class="hero__badge gsap-fade-up">
+                        <span class="hero__badge-dot"></span>
+                        Season 5: Mystic Meow is Live
+                    </div>
+                    <h1 class="hero__title gsap-fade-up">
+                        Dominate the <br>
+                        <span class="text-gradient">Magic Chess</span> Arena.
+                    </h1>
+                    <p class="hero__desc gsap-fade-up">
+                        The world's most advanced analytics platform. Build unbeatable lineups, analyze global meta trends, and compete in pro tournaments.
+                    </p>
+                    <div class="hero__buttons gsap-fade-up">
+                        <a href="app.html?view=community" class="btn btn--primary btn--lg icon-right">
+                            <span>Join Community</span>
+                            <i class="ph-bold ph-users-three"></i>
+                        </a>
+                        <a href="app.html" class="btn btn--glass btn--lg icon-left">
+                            <i class="ph-fill ph-wrench"></i>
+                            <span>Use Builder</span>
+                        </a>
+                    </div>
+                    
+                    <div class="hero__stats gsap-fade-up">
+                        <div class="stat-item">
+                            <span class="stat-item__value">1.2M+</span>
+                            <span class="stat-item__label">Lineups Built</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item__value">850k</span>
+                            <span class="stat-item__label">Active Users</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item__value">4.8/5</span>
+                            <span class="stat-item__label">Community Rating</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero__visual gsap-scale-in">
+                    <div class="visual-card visual-card--main">
+                        <div class="visual-card__header">
+                            <div class="visual-card__icon">🐱</div>
+                            <div>
+                                <div class="visual-card__title">Meow Synergy</div>
+                                <div class="visual-card__subtitle">Winrate 58.4%</div>
+                            </div>
+                        </div>
+                        <div class="visual-card__graph"></div>
+                    </div>
+                    <div class="visual-card visual-card--floating visual-card--1">
+                        <i class="ph-fill ph-trophy"></i>
+                        <span>Tournament Ready</span>
+                    </div>
+                    <div class="visual-card visual-card--floating visual-card--2">
+                        <i class="ph-fill ph-lightning"></i>
+                        <span>Real-time Data</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="services section">
+            <div class="container">
+                <div class="section__header text-center">
+                    <h2 class="section__title">Pro-Level Tools</h2>
+                    <p class="section__subtitle">Everything you need to reach Mythic rank.</p>
+                </div>
+
+                <div class="services__grid">
+                    <div class="card service-card">
+                        <div class="service-card__icon-box">
+                            <i class="ph-duotone ph-chart-line-up"></i>
+                        </div>
+                        <h3 class="service-card__title">Meta Analytics</h3>
+                        <p class="service-card__desc">Real-time data scraping from top 100 global matches. Know what's broken before everyone else.</p>
+                    </div>
+                    <div class="card service-card">
+                        <div class="service-card__icon-box">
+                            <i class="ph-duotone ph-strategy"></i>
+                        </div>
+                        <h3 class="service-card__title">Simulator Engine</h3>
+                        <p class="service-card__desc">Test your synergy combinations in our sandbox environment without losing rank points.</p>
+                    </div>
+                    <div class="card service-card">
+                        <div class="service-card__icon-box">
+                            <i class="ph-duotone ph-trophy"></i>
+                        </div>
+                        <h3 class="service-card__title">Esports Hub</h3>
+                        <p class="service-card__desc">Integrated tournament bracket system. Join daily scrims and compete for cash prizes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="portfolio section bg-darker">
+            <div class="container">
+                <div class="section__header flex-between">
+                    <div>
+                        <h2 class="section__title">Meta Snapshots</h2>
+                        <p class="section__subtitle">Trending lineups from the leaderboard.</p>
+                    </div>
+                    <a href="app.html?view=meta" class="btn-link">View All Builds <i class="ph-bold ph-arrow-right"></i></a>
+                </div>
+
+                <div class="portfolio__grid">
+                    <article class="build-card card">
+                        <div class="build-card__image">
+                            <div class="build-card__synergies">
+                                <span class="synergy-badge synergy-badge--gold">6 Astro</span>
+                                <span class="synergy-badge synergy-badge--silver">4 Assassin</span>
+                            </div>
+                        </div>
+                        <div class="build-card__content">
+                            <div class="build-card__meta">
+                                <span class="build-card__rank">S-Tier</span>
+                                <span class="build-card__winrate">WR: 62%</span>
+                            </div>
+                            <h3 class="build-card__title">Hyper Fanny Astro</h3>
+                            <p class="build-card__author">by @ProPlayer_ID</p>
+                            <a href="app.html" class="btn btn--outline btn--block">Copy Build</a>
+                        </div>
+                    </article>
+
+                    <article class="build-card card">
+                        <div class="build-card__image">
+                            <div class="build-card__synergies">
+                                <span class="synergy-badge synergy-badge--gold">6 Cadia</span>
+                                <span class="synergy-badge synergy-badge--silver">3 Swordsman</span>
+                            </div>
+                        </div>
+                        <div class="build-card__content">
+                            <div class="build-card__meta">
+                                <span class="build-card__rank">A-Tier</span>
+                                <span class="build-card__winrate">WR: 58%</span>
+                            </div>
+                            <h3 class="build-card__title">Ling Riverlands Carry</h3>
+                            <p class="build-card__author">by @MCGG_Official</p>
+                            <a href="app.html" class="btn btn--outline btn--block">Copy Build</a>
+                        </div>
+                    </article>
+
+                    <article class="build-card card">
+                        <div class="build-card__image">
+                            <div class="build-card__synergies">
+                                <span class="synergy-badge synergy-badge--gold">6 Nature</span>
+                                <span class="synergy-badge synergy-badge--bronze">2 Guardian</span>
+                            </div>
+                        </div>
+                        <div class="build-card__content">
+                            <div class="build-card__meta">
+                                <span class="build-card__rank">A+ Tier</span>
+                                <span class="build-card__winrate">WR: 55%</span>
+                            </div>
+                            <h3 class="build-card__title">Tharz Eudora Spam</h3>
+                            <p class="build-card__author">by @GlobalRank1</p>
+                            <a href="app.html" class="btn btn--outline btn--block">Copy Build</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="community" class="community section">
+            <div class="container">
+                <div class="community__wrapper card glass-panel">
+                    <div class="community__content">
+                        <span class="community__tag">MCGG HUB</span>
+                        <h2 class="community__title">Join the Conversation</h2>
+                        <p class="community__desc">Discuss strategies, share replays, and find teammates in our dedicated forum.</p>
+                        
+                        <div class="forum-preview">
+                            <div class="forum-topic">
+                                <div class="forum-topic__icon"><i class="ph-fill ph-fire text-orange-500"></i></div>
+                                <div class="forum-topic__details">
+                                    <h4>Nerf Tharz please?</h4>
+                                    <span>245 replies • Last post 2m ago</span>
+                                </div>
+                            </div>
+                            <div class="forum-topic">
+                                <div class="forum-topic__icon"><i class="ph-fill ph-question text-blue-500"></i></div>
+                                <div class="forum-topic__details">
+                                    <h4>Best counter for Mystic Meow?</h4>
+                                    <span>112 replies • Last post 5m ago</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="community__actions">
+                            <a href="app.html?view=community" class="btn btn--primary">Enter Forum</a>
+                            <a href="https://discord.gg/mcgg" target="_blank" class="btn btn--glass">Join Discord</a>
+                        </div>
+                    </div>
+                    
+                    <div class="community__visual">
+                        <div class="chat-ui">
+                            <div class="chat-bubble chat-bubble--left">Any tips for early game?</div>
+                            <div class="chat-bubble chat-bubble--right">Use Los Pecados for gold!</div>
+                            <div class="chat-bubble chat-bubble--left">Thanks! What about Commander?</div>
+                            <div class="chat-bubble chat-bubble--right">Remy skill 3 is solid.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact section">
+            <div class="container contact__container">
+                <div class="contact__info">
+                    <h2 class="section__title">Get in Touch</h2>
+                    <p class="section__subtitle">Have suggestions or found a bug? Let us know.</p>
+                    
+                    <div class="contact__details">
+                        <div class="contact__item">
+                            <i class="ph-bold ph-envelope-simple"></i>
+                            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d1a2a4a1a1bea3a591bcb2b6b6ffbfb4a5">[email&#160;protected]</a></span>
+                        </div>
+                        <div class="contact__item">
+                            <i class="ph-bold ph-map-pin"></i>
+                            <span>Jakarta, Indonesia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form class="contact__form card" action="#" method="POST">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" name="name" class="form-input" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="name@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea id="message" name="message" class="form-input form-textarea" placeholder="Describe your issue..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--block">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__top">
+                <div class="footer__brand">
+                    <div class="header__logo">
+                        <div class="header__logo-icon"><i class="ph-fill ph-hexagon"></i></div>
+                        <span class="header__logo-text">MCGG</span>
+                    </div>
+                    <p class="footer__desc">The ultimate ecosystem for Magic Chess enthusiasts. Built by players, for players.</p>
+                </div>
+                
+                <div class="footer__links">
+                    <div class="footer__column">
+                        <h4 class="footer__title">Platform</h4>
+                        <a href="app.html" class="footer__link">Builder Pro</a>
+                        <a href="app.html?view=meta" class="footer__link">Meta Tier List</a>
+                        <a href="app.html" class="footer__link">Simulator</a>
+                    </div>
+                    <div class="footer__column">
+                        <h4 class="footer__title">Community</h4>
+                        <a href="app.html?view=community" class="footer__link">Forums</a>
+                        <a href="#" class="footer__link">Tournaments</a>
+                        <a href="#" class="footer__link">Leaderboard</a>
+                    </div>
+                    <div class="footer__column">
+                        <h4 class="footer__title">Company</h4>
+                        <a href="#" class="footer__link">About Us</a>
+                        <a href="#" class="footer__link">Privacy Policy</a>
+                        <a href="#" class="footer__link">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer__bottom">
+                <p class="footer__copyright">&copy; 2026 MCGG Network. All rights reserved.</p>
+                <div class="footer__socials">
+                    <a href="#" aria-label="Twitter"><i class="ph-fill ph-twitter-logo"></i></a>
+                    <a href="#" aria-label="Discord"><i class="ph-fill ph-discord-logo"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="ph-fill ph-instagram-logo"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

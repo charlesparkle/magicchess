@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Secure</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="tokens.css">
+    <style>
+        :root { --bg: #09090b; --panel: #18181b; --border: #27272a; }
+        body { 
+            background: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; display: none; /* Sembunyikan total sebelum auth */
+        }
+        .admin-container { max-width: 1000px; margin: 40px auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .tabs { display: flex; gap: 10px; background: var(--panel); padding: 5px; border-radius: 12px; border: 1px solid var(--border); }
+        .tab-btn { 
+            background: transparent; border: none; color: #a1a1aa; padding: 8px 16px; 
+            border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;
+        }
+        .tab-btn.active { background: #27272a; color: white; }
+        .table-card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 16px; background: #212124; font-size: 13px; color: #71717a; text-transform: uppercase; }
+        td { padding: 16px; border-top: 1px solid var(--border); font-size: 14px; }
+        .btn-delete { background: #450a0a; color: #f87171; border: 1px solid #7f1d1d; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .btn-delete:hover { background: #7f1d1d; color: white; }
+        .loading-overlay { 
+            position: fixed; inset: 0; background: var(--bg); display: flex; 
+            justify-content: center; align-items: center; z-index: 9999; 
+        }
+    </style>
+</head>
+<body>
+    <div id="loader" class="loading-overlay">Memverifikasi Admin...</div>
+
+    <div class="admin-container">
+        <div class="header">
+            <h1 style="font-size: 24px;">Dashboard</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('posts', this)">Posts</button>
+                <button class="tab-btn" onclick="switchTab('comments', this)">Comments</button>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table id="admin-table">
+                <thead id="table-head"></thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>

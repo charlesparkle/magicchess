@@ -1,0 +1,219 @@
+/**
+ * layout.css — Shared Layout Components
+ * Single source of truth for all shared UI: app-shell, sidebar, glass-panel, buttons.
+ * 
+ * REPLACES duplicated code in app.css and builder.css.
+ * Load order in <head>:
+ *   <link rel="stylesheet" href="tokens.css">
+ *   <link rel="stylesheet" href="layout.css">
+ *   <link rel="stylesheet" href="app.css">   (or builder.css / post.css)
+ */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── Ambient Background ──────────────────────────────────────────────────── */
+#ambient-system {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+}
+.noise-overlay {
+    position: absolute; inset: 0; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(120px); opacity: 0.12;
+    width: 60vw; height: 60vw;
+}
+.blob--primary   { top: -10%; left: -10%; background: var(--clr-primary); }
+.blob--secondary { bottom: -10%; right: -10%; background: var(--clr-secondary); }
+
+/* ── App Shell ───────────────────────────────────────────────────────────── */
+.app-shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-width, 88px) 1fr;
+    height: 100vh; width: 100vw;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.sidebar {
+    background: rgba(10, 10, 10, 0.9);
+    border-right: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 0; z-index: 100;
+}
+.sidebar__logo {
+    display: flex; text-decoration: none;
+    margin-bottom: 40px;
+}
+.sidebar__logo-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, var(--clr-primary), var(--clr-secondary));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 26px;
+    box-shadow: 0 8px 24px var(--clr-primary-glow);
+    transition: transform 0.3s var(--anim-bounce);
+}
+.sidebar__logo-icon:hover { transform: scale(1.08) rotate(-4deg); }
+.sidebar__nav { flex: 1; width: 100%; }
+.sidebar__list {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.sidebar__link {
+    width: 68px; height: 68px;
+    border-radius: 16px; color: #71717a;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+    text-decoration: none;
+    transition: all 0.2s var(--anim-ios);
+    position: relative; border: 1px solid transparent;
+}
+.sidebar__link i      { font-size: 22px; }
+.sidebar__label       { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+.sidebar__link:hover  { background: rgba(255,255,255,0.05); color: #fff; }
+.sidebar__link--active {
+    background: var(--clr-primary); color: #fff !important;
+    box-shadow: 0 4px 15px var(--clr-primary-glow);
+}
+.sidebar__badge {
+    position: absolute; top: 8px; right: 8px;
+    min-width: 17px; height: 17px; padding: 0 4px;
+    background: #ef4444; color: #fff;
+    font-size: 9px; font-weight: 900; border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #0a0a0a;
+    animation: badge-pulse 2.5s infinite;
+}
+@keyframes badge-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+    50%      { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
+.sidebar__footer {
+    margin-top: auto;
+    display: flex; flex-direction: column;
+    gap: 16px; align-items: center;
+}
+.sidebar__action {
+    background: transparent; border: none;
+    color: #71717a; font-size: 20px;
+    cursor: pointer; transition: color 0.2s;
+}
+.sidebar__action:hover { color: #fff; }
+.sidebar__avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 2px solid var(--glass-border);
+    object-fit: cover;
+    transition: border-color 0.3s;
+    display: block;
+}
+.sidebar__user { cursor: pointer; }
+.sidebar__user:hover .sidebar__avatar { border-color: var(--clr-primary); }
+
+/* ── Content Header (shared base) ───────────────────────────────────────── */
+.content-header {
+    height: var(--header-height, 70px);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0;
+}
+.content-header__title      { font-size: 23px; font-weight: 800; }
+.content-header__subtitle   { font-size: 12px; color: #71717a; margin-top: 2px; }
+.content-header__actions    { display: flex; align-items: center; gap: 10px; }
+
+/* ── Glass Panel ─────────────────────────────────────────────────────────── */
+.glass-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    border-radius: 20px;
+}
+
+
+/* ── Search Field ─────────────────────────────────────────────────────────── */
+.search-field {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 240px;
+    transition: border-color 0.2s var(--anim-ios, cubic-bezier(0.4,0,0.2,1));
+}
+.search-field:focus-within { border-color: var(--clr-primary, #6366f1); }
+.search-field i { color: #52525b; font-size: 14px; flex-shrink: 0; }
+.search-field input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 13px;
+    width: 100%;
+    font-family: inherit;
+}
+.search-field input::placeholder { color: #52525b; }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 9px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 700; font-family: inherit;
+    cursor: pointer; border: none; text-decoration: none;
+    transition: all 0.2s var(--anim-bounce);
+    white-space: nowrap;
+}
+.btn--primary {
+    background: var(--clr-primary); color: #fff;
+    box-shadow: 0 4px 12px var(--clr-primary-glow);
+}
+.btn--primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px var(--clr-primary-glow); }
+.btn--ghost {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: #a1a1aa;
+}
+.btn--ghost:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+.btn--white { background: #fff; color: #000; font-weight: 700; }
+.btn--white:hover { background: #f0f0f0; transform: translateY(-1px); }
+.btn--block { width: 100%; justify-content: center; }
+.btn--sm { padding: 7px 13px; font-size: 12px; border-radius: 8px; }
+.icon-left i { order: -1; }
+
+/* ── Custom Scrollbar ────────────────────────────────────────────────────── */
+.custom-scroll::-webkit-scrollbar { width: 3px; }
+.custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+/* ── Toast / Notification ────────────────────────────────────────────────── */
+/* Kept here so both app.css and builder.css share the same toast styles */
+.toast-container {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    z-index: 10000; pointer-events: none;
+}
+.toast {
+    padding: 12px 18px; border-radius: 12px;
+    font-size: 13px; font-weight: 600;
+    background: rgba(10,10,10,0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: toast-in 0.3s var(--anim-bounce);
+    pointer-events: auto;
+    max-width: 360px;
+}
+.toast--error   { border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+.toast--success { border-color: rgba(34,197,94,0.4); color: #86efac; }
+.toast--warn    { border-color: rgba(234,179,8,0.4);  color: #fde68a; }
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Responsive: Collapse sidebar on mobile ──────────────────────────────── */
+@media (max-width: 768px) {
+    .app-shell { grid-template-columns: 1fr; }
+    /* Sidebar tidak di-display:none di sini — builder.css & app.css
+       masing-masing menangani pill/bottom-nav sendiri di breakpoint mereka */
+}
