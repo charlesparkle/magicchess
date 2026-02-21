@@ -641,7 +641,6 @@ body.page--post {
 #fab-create-post:active { transform: scale(0.91); }
 
 /* ==========================================================
-/* ==========================================================
    PERBAIKAN GLOBAL & FLEXBOX (Letakkan sebelum @media)
    Mencegah elemen membesar melebihi layar hp
    ========================================================== */
@@ -650,7 +649,7 @@ body.page--post {
 }
 
 .feed {
-    min-width: 0; 
+    min-width: 0; /* PENTING: Mencegah wadah feed mendobrak layar ke kanan */
     width: 100%;
 }
 
@@ -668,7 +667,7 @@ body.page--post {
 
 
 /* ══════════════════════════════════════════════════════════════
-   MOBILE & RESPONSIVE QUERIES (FULL UPDATED)
+   MOBILE & RESPONSIVE QUERIES (UPDATED)
    ══════════════════════════════════════════════════════════════ */
 @media (max-width: 1100px) {
     /* App shell: Hapus 100vw, gunakan 100% agar responsif sempurna */
@@ -693,25 +692,18 @@ body.page--post {
         height: auto;
         min-height: 70px;
         margin: 0;
-        padding: 12px 0 16px;
+        padding: 10px 0 12px;
         border-radius: 0;
-        gap: 20px;
+        gap: 12px;
         align-items: flex-start;
-        flex-direction: column; 
+        flex-direction: column; /* Ubah ke column agar rapi */
     }
     
-    .content-header__title-group { 
-        padding-right: 56px; /* Memberi ruang agar judul tidak tertabrak FAB Profile */
-    }
-
     .content-header__actions {
         width: 100%;
         display: flex;
         justify-content: space-between;
         gap: 10px;
-        margin-top: 4px; 
-        position: relative;
-        z-index: 1;
     }
 
     /* Sidebar / Bottom Nav - Sesuaikan margin agar di tengah sempurna */
@@ -770,14 +762,7 @@ body.page--post {
 
     #open-create-post { display: none; }
     #fab-create-post { display: flex; min-width: 52px; min-height: 52px; }
-    
-    #fab-profile { 
-        display: flex; 
-        min-width: 42px; 
-        min-height: 42px;
-        top: calc(14px + env(safe-area-inset-top, 0px)); /* Menghindari area poni HP */
-        right: 20px;
-    }
+    #fab-profile { display: flex; min-width: 44px; min-height: 44px; }
 
     .layout-grid { grid-template-columns: 1fr; width: 100%; margin: 10px auto 0; }
     .side-panel { display: none; }
@@ -788,9 +773,7 @@ body.page--post {
     .content-header__title { font-size: 18px; line-height: 1.2; }
     .content-header__subtitle { display: none; }
     
-    .content-header { padding-top: 14px; }
-    .content-header__actions { margin-top: 15px !important; } /* Memaksa search turun */
-    
+    /* Search Bar Perbaikan: Jangan di-hidden, jadikan lebar 100% */
     .search-field { 
         display: flex;
         width: 100%;
@@ -818,7 +801,7 @@ body.page--post {
     .feed__filters::-webkit-scrollbar { display: none; }
     
     .feed__tabs, .feed__sort-wrap {
-        flex-shrink: 0; 
+        flex-shrink: 0; /* Pastikan tab filter tidak penyok */
     }
 
     .main-content { padding: 0 16px calc(100px + env(safe-area-inset-bottom, 12px)); }
@@ -827,10 +810,6 @@ body.page--post {
     .post__title { font-size: 16px; margin-bottom: 8px; }
     .post__excerpt { font-size: 12px; line-height: 1.5; }
     .post__header { gap: 10px; }
-    
-    #fab-profile {
-        right: 16px; 
-    }
 }
 
 @media (max-width: 400px) {
@@ -852,5 +831,5 @@ body.page--post {
     .cp-overlay--visible .cp-composer {
         transform: translateY(0);
     }
-    .cp-textarea { font-size: 16px; }
+    .cp-textarea { font-size: 16px; /* Mencegah Auto-Zoom di iOS Safari */ }
 }
