@@ -11,11 +11,13 @@ import {
   initAuth, requireAuth, onAuthChange, getSession, signOut, 
   SUPABASE_URL, SUPABASE_ANON_KEY 
 } from './auth.js';
-// Tambahkan getSession dan signOut jika belum ada di list import
 
-// FIX: Import checkProfanity from moderation.js — replaces duplicate isToxic()
 import { checkProfanity } from './moderation.js';
-// ─── SUPABASE HELPERS (WAJIB ADA UNTUK PROFIL & DATABASE) ─────────────────────
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const AUTOSAVE_KEY = 'mcgg_autosave_lineup';
+
+// ─── SUPABASE HELPERS ────────────────────────────────────────────────────────
 async function sbGet(table, params = '') {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
     headers: {
@@ -56,13 +58,7 @@ async function sbUpsert(table, body, token = null) {
   return rows[0] ?? null;
 }
 
-// isToxic() REMOVED — replaced by checkProfanity() from moderation.js (DRY fix)
-// Usage: checkProfanity(text).clean === false means toxic
-
-
-// ─── SECURITY UTILS ────────────────────────────────────────────────────────────
-// Escapes HTML special chars — wajib dipakai sebelum interpolasi ke innerHTML.
-// Dipakai untuk data yang bisa datang dari URL (user-controlled input).
+// ─── SECURITY & VALIDATION UTILS ─────────────────────────────────────────────
 function sanitize(str) {
   return String(str)
     .replace(/&/g, '&amp;')
@@ -72,8 +68,6 @@ function sanitize(str) {
     .replace(/'/g, '&#39;');
 }
 
-// Set semua trait valid dari HERO_DB — dipakai untuk validasi input URL.
-// Dihitung sekali saat modul load, bukan setiap kali decodeFromURL dipanggil.
 function buildAllTraits() {
   const s = new Set();
   HERO_DB.forEach(h => h.traits.forEach(t => s.add(t)));
@@ -81,16 +75,15 @@ function buildAllTraits() {
 }
 const ALL_TRAITS = buildAllTraits();
 
-// Validasi heroId: harus ada di HERO_DB
 function isValidHeroId(id) { return HERO_DB.some(h => h.id === id); }
 
-// Validasi posisi board: format "row-col", angka dalam range
 function isValidPos(pos) {
   const [r, c] = pos.split('-').map(Number);
   return Number.isInteger(r) && Number.isInteger(c) &&
          r >= 0 && r < 6 && c >= 0 && c < 7;
 }
 
+// ─── GLOBALS & STATE ─────────────────────────────────────────────────────────
 const BOARD_ROWS       = 6;
 const BOARD_COLS       = 7;
 const ENEMY_ROW_END    = 3;
@@ -102,6 +95,7 @@ const State = {
   blessedPos: null,
 };
 
+// ─── SYNERGY LOGIC ───────────────────────────────────────────────────────────
 function getActiveCount(traitName, rawCount) {
   const thr = SYNERGY_THRESHOLDS[traitName] || [2, 4];
   if (traitName === 'Mortal Rival') {
@@ -113,6 +107,7 @@ function getActiveCount(traitName, rawCount) {
   return { activeCount, activeTier, nextThreshold, thr };
 }
 
+// ─── BOARD & HERO RENDERING ──────────────────────────────────────────────────
 function generateBoard() {
   const boardEl = document.getElementById('chess-board');
   if (!boardEl) return;
@@ -148,16 +143,27 @@ function generateBoard() {
 function addHeroToBoard(heroId, pos) {
   const hero = HERO_DB.find(h => h.id === heroId);
   if (!hero) return;
+
   const row  = Number(pos.split('-')[0]);
   const zone = row < ENEMY_ROW_END ? 'enemy' : 'player';
+
+  const isAlreadyOnBoard = Object.values(State.board).some(h => h.id === heroId);
+
+  if (isAlreadyOnBoard) {
+    showToast(`${hero.name} sudah ada di board!`, 'warn');
+    return;
+  }
+
   if (zone === 'player' && !State.board[pos]) {
     const playerCount = Object.keys(State.board)
       .filter(k => Number(k.split('-')[0]) >= PLAYER_ROW_START).length;
     if (playerCount >= 10) { showToast('Area kita penuh! (maks 10 hero)'); return; }
   }
+  
   State.board[pos] = { ...hero, instanceId: Date.now(), isBlessed: false, blessedTrait: null, zone };
   renderBoard();
   updateSynergies();
+  renderHeroPool();
 }
 
 function moveHeroOnBoard(fromPos, toPos) {
@@ -166,6 +172,7 @@ function moveHeroOnBoard(fromPos, toPos) {
   if (!hero) return;
   const toRow  = Number(toPos.split('-')[0]);
   const toZone = toRow < ENEMY_ROW_END ? 'enemy' : 'player';
+  
   if (toZone === 'player' && !State.board[toPos]) {
     const playerCount = Object.keys(State.board)
       .filter(k => Number(k.split('-')[0]) >= PLAYER_ROW_START && k !== fromPos).length;
@@ -198,6 +205,7 @@ function removeHero(pos) {
   delete State.board[pos];
   renderBoard();
   updateSynergies();
+  renderHeroPool();
 }
 
 function autoPlace(heroId) {
@@ -210,28 +218,17 @@ function autoPlace(heroId) {
   showToast('Area kita penuh!');
 }
 
-/**
- * renderBoard — Optimised incremental render.
- * Instead of wiping all tokens and rebuilding from scratch on every state change,
- * we iterate each cell and only mutate what actually changed:
- *  - Cell has a token but board[pos] is empty   → remove token
- *  - Cell has no token but board[pos] has hero   → create & attach token
- *  - Cell token exists and board[pos] has hero   → update in-place (style only)
- * This eliminates unnecessary DOM repaint/reflow for unchanged cells.
- */
 function renderBoard() {
   document.querySelectorAll('.arena-cell').forEach(cell => {
     const pos    = cell.dataset.pos;
     const hero   = State.board[pos];
     let   token  = cell.querySelector('.hero-token');
 
-    // ── Case 1: no hero for this cell — remove any existing token ──────────────
     if (!hero) {
       token?.remove();
       return;
     }
 
-    // ── Case 2: token doesn't exist yet — create it ────────────────────────────
     if (!token) {
       token = document.createElement('div');
       token.className = 'hero-token';
@@ -248,7 +245,6 @@ function renderBoard() {
       cell.appendChild(token);
     }
 
-    // ── Case 3: token exists — sync mutable attributes only ───────────────────
     token.title = hero.name;
     token.style.backgroundImage = `url(${hero.img})`;
     token.classList.toggle('hero-token--enemy', hero.zone === 'enemy');
@@ -270,6 +266,9 @@ function renderHeroPool() {
   const poolEl = document.getElementById('hero-pool');
   if (!poolEl) return;
   poolEl.innerHTML = '';
+
+  const activeOnBoard = new Set(Object.values(State.board).map(h => h.id));
+
   const filtered = HERO_DB.filter(h => {
     const matchCost   = State.filters.cost === 'all' || h.cost.toString() === State.filters.cost;
     const matchSearch = State.filters.search === '' ||
@@ -278,24 +277,32 @@ function renderHeroPool() {
     return matchCost && matchSearch;
   });
   filtered.forEach(hero => {
+    const isSelected = activeOnBoard.has(hero.id);
     const card = document.createElement('div');
-    card.className      = 'hero-card';
-    card.draggable      = true;
+    card.className      = 'hero-card' + (isSelected ? ' hero-card--selected' : '');
+    card.draggable      = !isSelected;
     card.dataset.heroId = hero.id;
-    card.title          = `${hero.name} · ${hero.traits.join(' / ')}`;
+    card.title          = isSelected ? `${hero.name} (Sudah di board)` : `${hero.name} · ${hero.traits.join(' / ')}`;
     card.innerHTML = `
       <div class="hero-card__img-wrap">
         <img src="${sanitize(hero.img)}" alt="${sanitize(hero.name)}" class="hero-card__img" loading="lazy">
         <span class="hero-card__cost" style="background:${COST_COLORS[hero.cost] ?? '#6366f1'}">${hero.cost}</span>
+        ${isSelected ? '<div class="hero-card__overlay"><i class="ph-bold ph-check"></i></div>' : ''}
       </div>
       <div class="hero-card__info">
         <span class="hero-card__name">${sanitize(hero.name)}</span>
       </div>`;
-    card.addEventListener('dragstart', e => {
-      e.dataTransfer.setData('heroId', hero.id);
-      e.dataTransfer.setData('fromPos', '');
-    });
-    card.addEventListener('click', () => autoPlace(hero.id));
+    
+    if (!isSelected) {
+        card.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('heroId', hero.id);
+          e.dataTransfer.setData('fromPos', '');
+        });
+        card.addEventListener('click', () => autoPlace(hero.id));
+    } else {
+        card.style.cursor = 'not-allowed';
+        card.style.opacity = '0.5';
+    }
     poolEl.appendChild(card);
   });
   const countEl = document.getElementById('hero-pool-count');
@@ -308,6 +315,7 @@ function updateSynergies() {
     .map(([, h]) => h);
   const seen   = new Set();
   const unique = playerHeroes.filter(h => seen.has(h.name) ? false : (seen.add(h.name), true));
+  
   const tp     = {};
   unique.forEach(h => {
     h.traits.forEach(t => { tp[t] = (tp[t] || 0) + 1; });
@@ -326,9 +334,25 @@ function updateSynergies() {
   const activeTypeCount = Object.entries(tp).filter(([name, raw]) =>
     name === 'Mortal Rival' ? mortalActive : Math.floor(raw / 2) * 2 >= 2
   ).length;
+  const meowActive = activeTypeCount >= 9;
   renderSynergyDisplay(tp, mortalActive);
-  renderHeaderStats(unique.length, playerHeroes.reduce((s, h) => s + h.cost, 0));
+
+  renderHeaderStats(playerHeroes.length, playerHeroes.reduce((s, h) => s + h.cost, 0));
+  
   encodeToURL();
+
+  // Autosave state to localStorage
+  try {
+    const lineupData = {
+        board: State.board,
+        blessedPos: State.blessedPos,
+        gl1: document.getElementById('gl-select-1g')?.value || '',
+        gl5: document.getElementById('gl-select-5g')?.value || '',
+    };
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(lineupData));
+  } catch (e) {
+      console.warn('Gagal menyimpan state lineup secara otomatis.', e);
+  }
 }
 
 function renderSynergyDisplay(tp, mortalActive) {
@@ -351,18 +375,15 @@ function renderSynergyDisplay(tp, mortalActive) {
     .sort((a, b) => b.activeCount - a.activeCount || b.rawCount - a.rawCount)
     .forEach(({ name, rawCount, activeCount, activeTier, isActive }) => {
       
-      // Ambil data batas sinergi (misal: [2, 4, 6])
       const thr    = SYNERGY_THRESHOLDS[name] || [2, 4];
       const maxThr = thr[thr.length - 1] || 6; 
       
-      // Progress bar dikunci persentasenya menuju level maksimal sinergi
       const displayPct = Math.min((rawCount / maxThr) * 100, 100);
 
       const tierColors = ['#6366f1','#a855f7','#eab308','#22c55e'];
       const tierIdx    = activeTier ? thr.indexOf(activeTier) : -1;
       const activeClr  = tierColors[Math.max(0, tierIdx)] || '#6366f1';
 
-      // Titik indikator (pips) hanya menyala tegas jika threshold sudah terlewati
       const pips = thr.map(t => {
         const reached = activeCount >= t;
         return `<span class="syn-pip ${reached ? 'syn-pip--lit' : ''}" style="${reached ? 'background:' + activeClr + ';border-color:' + activeClr : ''}"></span>`;
@@ -371,7 +392,6 @@ function renderSynergyDisplay(tp, mortalActive) {
       const row = document.createElement('div');
       row.className = 'synergy-row' + (isActive ? ' synergy-row--active' : '');
       
-      // UI HTML Bersih tanpa teks hint cerewet
       row.innerHTML = `
         <div class="syn-icon" title="${name}"></div>
         <div class="syn-info">
@@ -394,11 +414,11 @@ function renderSynergyDisplay(tp, mortalActive) {
     });
 }
 
-function renderHeaderStats(playerUniqueCount, totalGold) {
+function renderHeaderStats(playerCount, totalGold) {
   const goldEl = document.getElementById('total-gold');
   const popEl  = document.getElementById('population-count');
   if (goldEl) goldEl.textContent = totalGold;
-  if (popEl)  popEl.textContent  = `${playerUniqueCount}/10`;
+  if (popEl)  popEl.textContent  = `${playerCount}/10`;
 }
 
 function hexToRgb(hex) {
@@ -411,8 +431,6 @@ function hexToRgb(hex) {
 function openHeroDetailModal(pos) {
   const hero = State.board[pos];
   if (!hero) return;
-  // FIX: Abort the previous modal's AbortController before removing it,
-  // preventing dangling event listeners from accumulating on each modal open.
   if (openHeroDetailModal._activeAc) {
     openHeroDetailModal._activeAc.abort();
     openHeroDetailModal._activeAc = null;
@@ -462,26 +480,17 @@ function openHeroDetailModal(pos) {
   overlay.setAttribute('aria-label', `${hero.name} detail`);
   document.body.appendChild(overlay);
 
-  // ── AbortController ──────────────────────────────────────────────────────────
-  // All event listeners added for this modal instance are registered with this
-  // signal. Calling ac.abort() on ANY close path (X button, Remove, backdrop
-  // click, Escape key) removes every listener simultaneously — no leaks possible.
   const ac = new AbortController();
-  openHeroDetailModal._activeAc = ac; // FIX: track active controller for cleanup
+  openHeroDetailModal._activeAc = ac; 
   const { signal } = ac;
 
   function closeModal() {
-    ac.abort();      // removes all signal-bound listeners in one call
-    openHeroDetailModal._activeAc = null; // FIX: clear reference on normal close
+    ac.abort();      
+    openHeroDetailModal._activeAc = null; 
     overlay.remove();
-    // Return focus to the hero token that opened this modal
     document.querySelector(`.arena-cell[data-pos="${pos}"] .hero-token`)?.focus();
   }
 
-  // ── Focus Trap ───────────────────────────────────────────────────────────────
-  // While the modal is open, Tab/Shift+Tab must cycle only within the modal.
-  // Elements behind the overlay remain in the DOM and would otherwise receive
-  // focus, making the UI confusing and violating WCAG 2.1 Success Criterion 2.1.2.
   const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
   function getFocusable() {
@@ -505,7 +514,6 @@ function openHeroDetailModal(pos) {
     }
   }, { signal });
 
-  // Move focus into the modal's first focusable element
   requestAnimationFrame(() => getFocusable()[0]?.focus());
 
   const body = document.getElementById('hdm-body');
@@ -625,7 +633,6 @@ function openHeroDetailModal(pos) {
   document.getElementById('hdm-remove').addEventListener('click', () => { removeHero(pos); closeModal(); }, { signal });
   overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); }, { signal });
 
-  // Escape key — now also registered with signal so it's auto-removed on ANY close path
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); }, { signal });
   renderTab('info');
 }
@@ -669,7 +676,10 @@ function bindEvents() {
     document.getElementById('chess-board')?.classList.toggle('flat'));
   document.getElementById('clear-board')?.addEventListener('click', () => {
     State.board = {}; State.blessedPos = null;
+    // Clear auto-saved state as well
+    try { localStorage.removeItem(AUTOSAVE_KEY); } catch(e) {}
     renderBoard(); updateSynergies();
+    renderHeroPool();
   });
   document.getElementById('hero-search')?.addEventListener('input', e => {
     State.filters.search = e.target.value.trim().toLowerCase();
@@ -687,18 +697,15 @@ function bindEvents() {
 }
 
 function bindProfileEvents() {
-    // Desktop: Klik pada avatar di sidebar kiri
     document.querySelector('.sidebar__user')?.addEventListener('click', () => {
         if (typeof openProfileModal === 'function') openProfileModal();
     });
 
-    // Mobile: Klik pada FAB profil (jika ada di HTML)
     document.getElementById('fab-profile')?.addEventListener('click', () => {
         if (typeof openProfileModal === 'function') openProfileModal();
     });
 }
 
-// ─── FITUR PROFIL VISUAL ──────────────────────────────────────────────────────────
 function openProfileModal() {
   let modal = document.getElementById('profile-modal');
   if (!modal) modal = _buildProfileModal();
@@ -715,7 +722,6 @@ function openProfileModal() {
   const cmdEl  = modal.querySelector('#pm-commander');
   const linEl  = modal.querySelector('#pm-lineup-display');
 
-  // Helper merender JSON Lineup jadi visual gambar
   function renderVisualLineup(jsonStr) {
     try {
       const data = JSON.parse(jsonStr);
@@ -808,7 +814,6 @@ function _buildProfileModal() {
     showToast('Kamu telah logout.', 'info');
   });
 
-  // Tombol Simpan di profil sekarang HANYA simpan rank & commander (Lineup disave dari halaman Builder)
   el.querySelector('#pm-save').addEventListener('click', async () => {
     const session = typeof getSession === 'function' ? getSession() : null;
     const rank    = el.querySelector('#pm-rank').value;
@@ -839,7 +844,6 @@ function _closeProfileModal() {
 }
 
 
-// ─── FITUR SIMPAN & BAGIKAN KE KOMUNITAS ──────────────────────────────────────
 function handleSaveLineup() {
   const session = typeof getSession === 'function' ? getSession() : null;
   if (!session) { showToast('⚠ Login dulu untuk menyimpan lineup!', 'warn'); return; }
@@ -866,7 +870,6 @@ function handleSaveLineup() {
     .map(([n, v]) => `${n} x${n === 'Mortal Rival' ? v : Math.floor(v / 2) * 2}`)
     .join(', ');
 
-  // KITA SIMPAN SEBAGAI OBJEK JSON AGAR BISA DIREKTUR JADI GAMBAR DI PROFIL
   const savedData = {
     heroes: unique.map(h => h.id),
     synergies: activeSynergies || 'Belum ada'
@@ -894,13 +897,10 @@ function _showShareCommunityModal(heroes, synergies) {
   el.id = 'share-modal';
   el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(14px);padding:16px;';
 
-  // Hero images for download capture
   const heroImgs = heroes.map(h => `<img src="${sanitize(h.img)}" title="${sanitize(h.name)}" style="width:44px;height:44px;border-radius:8px;border:2px solid rgba(99,102,241,0.6);object-fit:cover;background:#1a1a2e;" loading="lazy">`).join('');
 
-  // embedHTML stored in database 'body' field — must use flex-direction:row so feed card renders hero grid correctly
   const embedHTML = `<div style="background:#131317;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;font-family:'Plus Jakarta Sans',sans-serif;"><h4 style="margin:0 0 14px;color:#fff;font-size:15px;font-weight:800;">🔥 Lineup Magic Chess GoGo</h4><div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:flex-start;">${heroes.map(h=>`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><img src="${sanitize(h.img)}" title="${sanitize(h.name)}" style="width:52px;height:52px;border-radius:10px;border:2px solid rgba(99,102,241,0.6);object-fit:cover;background:#1a1a2e;" loading="lazy"><span style="font-size:9px;color:#a1a1aa;font-weight:600;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;">${sanitize(h.name)}</span></div>`).join('')}</div><div style="font-size:12px;color:#eab308;font-weight:700;">✦ Sinergi: ${synergies || 'Belum ada'}</div></div>`;
 
-  // Capture area for html2canvas download
   const captureAreaHTML = `
     <div id="lineup-capture-area" style="background:#131317;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
       <h4 style="margin:0 0 14px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;">🔥 Lineup Magic Chess GoGo</h4>
@@ -935,7 +935,6 @@ function _showShareCommunityModal(heroes, synergies) {
 
   el.querySelector('#sm-cancel').addEventListener('click', () => el.remove());
 
-  // EVENT LISTENER DOWNLOAD GAMBAR (MENGGUNAKAN HTML2CANVAS)
   el.querySelector('#sm-download').addEventListener('click', () => {
     if (typeof html2canvas === 'undefined') {
       showToast('⚠ Error: Script html2canvas belum ditambahkan di HTML', 'error');
@@ -945,7 +944,6 @@ function _showShareCommunityModal(heroes, synergies) {
     const btn = el.querySelector('#sm-download');
     btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Memproses...';
     
-    // allowTaint & useCORS mencegah error gambar dari link luar
     html2canvas(target, { backgroundColor: '#131317', useCORS: true, allowTaint: true }).then(canvas => {
       const link = document.createElement('a');
       link.download = `MCGG-Lineup-${Date.now()}.png`;
@@ -959,13 +957,10 @@ function _showShareCommunityModal(heroes, synergies) {
     });
   });
 
-  // EVENT LISTENER POSTING KOMUNITAS
   el.querySelector('#sm-post').addEventListener('click', async () => {
     const titleInput = el.querySelector('#sm-title').value.trim();
     if (!titleInput) { showToast('Judul postingan harus diisi!', 'warn'); return; }
 
-    // HAPUS INI: const BANNED = [...]; if (BANNED.some(...))
-    // GANTI JADI INI:
     if (!checkProfanity(titleInput).clean) {
         showToast('⚠️ Waduh, bahasanya dijaga ya bang!', 'error'); 
         return;
@@ -977,7 +972,6 @@ function _showShareCommunityModal(heroes, synergies) {
 
     try {
       const uname = session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User';
-      // === KODE BYPASS SUPABASE ===
       const response = await fetch(`${SUPABASE_URL}/rest/v1/posts`, {
         method: 'POST',
         headers: {
@@ -990,7 +984,7 @@ function _showShareCommunityModal(heroes, synergies) {
           title: titleInput, 
           body: embedHTML, 
           author: uname, 
-          author_initials: uname.slice(0, 2).toUpperCase(), // <-- Tambahin inisial (misal: "CH")
+          author_initials: uname.slice(0, 2).toUpperCase(), 
           user_id: session.user.id,
           category: 'guide', 
           tag: 'Lineup'
@@ -998,14 +992,10 @@ function _showShareCommunityModal(heroes, synergies) {
       });
 
       if (!response.ok) {
-        // Kita tangkap error lengkapnya dari Supabase
         const err = await response.json();
-        console.error("🔎 DETAIL ERROR SUPABASE:", err);
-        // Tampilkan pesan error spesifik beserta hint/detailnya ke Toast
-        throw new Error(`${err.message} - ${err.details || err.hint || 'Cek console browser!'}`);
+        throw new Error(`${err.message}`);
       }
 
-      // === END KODE BYPASS ===
       showToast('✓ Berhasil diposting ke Komunitas!', 'success');
       el.remove();
     } catch (err) {
@@ -1015,7 +1005,6 @@ function _showShareCommunityModal(heroes, synergies) {
   });
 }
 
-// --- DATA PROFIL MAGIC CHESS (WAJIB ADA AGAR TIDAK ERROR) ---
 const MC_RANKS = [
   'Rookie I','Rookie II','Rookie III',
   'Elite I','Elite II','Elite III',
@@ -1038,96 +1027,156 @@ const MC_COMMANDERS = [
   'Argus','Dyrroth','Phoveus','Aulus','Xavier',
 ];
 
-// Pastikan helper localStorage ini juga ada agar fitur Simpan jalan
 const PROFILE_LS_KEY = 'mcgg_user_profile';
 function _loadLocalProfile()   { try { return JSON.parse(localStorage.getItem(PROFILE_LS_KEY) || '{}'); } catch { return {}; } }
 function _saveLocalProfile(d)  { try { localStorage.setItem(PROFILE_LS_KEY, JSON.stringify(d)); } catch (_) {} }
 
-// ─── TOUCH DRAG-AND-DROP ────────────────────────────────────────────────────────
-// HTML5 DnD API only works with a mouse. This adds equivalent touch support
-// by translating touchstart/touchmove/touchend into the same board actions.
-let touchDrag = null; // { fromPos?, heroId?, ghost }
-
+// MOBILE TOUCH DND LOGIC --- REFINED
 function initTouchDnD() {
-  const board   = document.getElementById('chess-board');
+  const board = document.getElementById('chess-board');
   const heroPool = document.getElementById('hero-pool');
   if (!board) return;
 
-  // Helper: get the board cell (arena-cell) under a touch point
+  let touchDrag = null;
+  let boardTouchTimer = null;
+  let startTouchPos = null;
+
   function cellAtPoint(x, y) {
     const el = document.elementFromPoint(x, y);
     return el?.closest('.arena-cell') ?? null;
   }
 
-  // Helper: create a translucent ghost element that follows the finger
-  function createGhost(sourceEl) {
+  function createGhost(sourceEl, isFromPool = false) {
     const ghost = sourceEl.cloneNode(true);
+    const rect = sourceEl.getBoundingClientRect();
     ghost.style.cssText = `
       position: fixed; opacity: 0.7; pointer-events: none; z-index: 9999;
-      width: ${sourceEl.offsetWidth}px; height: ${sourceEl.offsetHeight}px;
-      border-radius: 50%; transform: translate(-50%, -50%); transition: none;
+      width: ${isFromPool ? '56px' : rect.width + 'px'};
+      height: ${isFromPool ? '56px' : rect.height + 'px'};
+      border-radius: ${isFromPool ? '50%' : '12px'};
+      transform: translate(-50%, -50%); transition: none;
+      background-size: cover;
     `;
+    if (isFromPool) {
+        ghost.style.backgroundImage = sourceEl.querySelector('.hero-card__img').style.backgroundImage;
+    }
     document.body.appendChild(ghost);
     return ghost;
   }
 
   function moveGhost(ghost, x, y) {
-    ghost.style.left = `${x}px`;
-    ghost.style.top  = `${y}px`;
+    if (ghost) {
+      ghost.style.left = `${x}px`;
+      ghost.style.top = `${y}px`;
+    }
   }
 
   function clearHighlight() {
     document.querySelectorAll('.arena-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
   }
 
-  // Touch on a hero token already on the board
-  board.addEventListener('touchstart', e => {
+  // --- Board Touch Logic (Tap vs. Drag) ---
+  board.addEventListener('touchstart', (e) => {
     const token = e.target.closest('.hero-token');
-    const cell  = e.target.closest('.arena-cell');
-    if (!token || !cell) return;
+    if (!token) return;
 
-    e.preventDefault();
+    const cell = token.closest('.arena-cell');
+    if (!cell) return;
+
     const t = e.touches[0];
-    touchDrag = { fromPos: cell.dataset.pos, ghost: createGhost(token) };
-    moveGhost(touchDrag.ghost, t.clientX, t.clientY);
-  }, { passive: false });
+    startTouchPos = { x: t.clientX, y: t.clientY };
 
-  // Touch on a hero card in the pool
-  // Menggunakan long-press 280ms agar scroll daftar hero tidak mati.
-  // passive:true di touchstart = browser tetap bisa scroll; preventDefault hanya
-  // dipanggil di touchmove SETELAH drag dikonfirmasi.
+    boardTouchTimer = setTimeout(() => {
+      boardTouchTimer = null; 
+      touchDrag = { fromPos: cell.dataset.pos, ghost: createGhost(token) };
+      moveGhost(touchDrag.ghost, t.clientX, t.clientY);
+    }, 250); // 250ms delay to differentiate tap from long-press/drag
+
+  }, { passive: true });
+
+  board.addEventListener('touchmove', (e) => {
+    if (!startTouchPos) return;
+
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - startTouchPos.x);
+    const dy = Math.abs(t.clientY - startTouchPos.y);
+
+    if (dx > 10 || dy > 10) { // If finger moves significantly, it's a drag
+      if (boardTouchTimer) {
+        clearTimeout(boardTouchTimer);
+        boardTouchTimer = null;
+      }
+      if (!touchDrag) { // Start drag if not already started
+          const token = e.target.closest('.hero-token');
+          const cell = token?.closest('.arena-cell');
+          if (!token || !cell) return;
+
+          touchDrag = { fromPos: cell.dataset.pos, ghost: createGhost(token) };
+          moveGhost(touchDrag.ghost, t.clientX, t.clientY);
+      }
+    }
+  }, { passive: true });
+
+  board.addEventListener('touchend', (e) => {
+    if (boardTouchTimer) { // If timer is still active, it was a tap
+      clearTimeout(boardTouchTimer);
+      boardTouchTimer = null;
+      const cell = e.target.closest('.arena-cell');
+      if (cell) {
+        openHeroDetailModal(cell.dataset.pos);
+      }
+    }
+    startTouchPos = null;
+  });
+
+
+  // --- Hero Pool Touch Logic (existing, slightly adapted) ---
   if (heroPool) {
-    let lpTimer  = null;
-    let lpOrigin = null;
+    let poolTouchTimer = null;
+    let poolStartPos = null;
 
     heroPool.addEventListener('touchstart', e => {
       const card = e.target.closest('.hero-card');
-      if (!card) return;
+      if (!card || card.classList.contains('hero-card--selected')) return;
       const t = e.touches[0];
-      lpOrigin = { x: t.clientX, y: t.clientY };
-      lpTimer  = setTimeout(() => {
-        lpTimer = null;
-        touchDrag = { heroId: card.dataset.heroId, ghost: createGhost(card) };
+      poolStartPos = { x: t.clientX, y: t.clientY };
+      poolTouchTimer = setTimeout(() => {
+        poolTouchTimer = null;
+        touchDrag = { heroId: card.dataset.heroId, ghost: createGhost(card.querySelector('.hero-card__img-wrap'), true) };
         moveGhost(touchDrag.ghost, t.clientX, t.clientY);
         card.style.opacity = '0.45';
       }, 280);
     }, { passive: true });
 
     heroPool.addEventListener('touchmove', e => {
-      if (!lpTimer) return;
-      const t  = e.touches[0];
-      const dx = Math.abs(t.clientX - lpOrigin.x);
-      const dy = Math.abs(t.clientY - lpOrigin.y);
-      if (dx > 8 || dy > 8) { clearTimeout(lpTimer); lpTimer = null; }
+        if (!poolStartPos) return;
+        const t = e.touches[0];
+        const dx = Math.abs(t.clientX - poolStartPos.x);
+        const dy = Math.abs(t.clientY - poolStartPos.y);
+        if (dx > 10 || dy > 10) {
+            if (poolTouchTimer) {
+                clearTimeout(poolTouchTimer);
+                poolTouchTimer = null;
+            }
+        }
     }, { passive: true });
 
     heroPool.addEventListener('touchend', e => {
-      clearTimeout(lpTimer); lpTimer = null;
+      if (poolTouchTimer) { // It was a quick tap, not a drag
+          clearTimeout(poolTouchTimer);
+          poolTouchTimer = null;
+          const card = e.target.closest('.hero-card');
+          if (card && !card.classList.contains('hero-card--selected')) {
+              autoPlace(card.dataset.heroId);
+          }
+      }
       const card = e.target.closest('.hero-card');
       if (card) card.style.removeProperty('opacity');
-    }, { passive: true });
+      poolStartPos = null;
+    });
   }
 
+  // --- Global Listeners (handle move and drop for both cases) ---
   document.addEventListener('touchmove', e => {
     if (!touchDrag) return;
     e.preventDefault();
@@ -1135,39 +1184,44 @@ function initTouchDnD() {
     moveGhost(touchDrag.ghost, t.clientX, t.clientY);
 
     clearHighlight();
-    const target = cellAtPoint(t.clientX, t.clientY);
-    if (target) target.classList.add('drag-over');
+    const targetCell = cellAtPoint(t.clientX, t.clientY);
+    if (targetCell) {
+      targetCell.classList.add('drag-over');
+    }
   }, { passive: false });
 
   document.addEventListener('touchend', e => {
     if (!touchDrag) return;
     const t = e.changedTouches[0];
     clearHighlight();
-    touchDrag.ghost.remove();
+    touchDrag.ghost?.remove();
 
-    const target = cellAtPoint(t.clientX, t.clientY);
-    if (target) {
+    const targetCell = cellAtPoint(t.clientX, t.clientY);
+    if (targetCell) {
       if (touchDrag.fromPos) {
-        moveHeroOnBoard(touchDrag.fromPos, target.dataset.pos);
+        moveHeroOnBoard(touchDrag.fromPos, targetCell.dataset.pos);
       } else if (touchDrag.heroId) {
-        addHeroToBoard(touchDrag.heroId, target.dataset.pos);
+        addHeroToBoard(touchDrag.heroId, targetCell.dataset.pos);
       }
     }
+    
+    // Reset opacity for hero pool cards after drop
+    const card = heroPool?.querySelector(`.hero-card[data-hero-id="${touchDrag.heroId}"]`);
+    if(card) card.style.removeProperty('opacity');
+
     touchDrag = null;
   });
 
   document.addEventListener('touchcancel', () => {
     if (!touchDrag) return;
     clearHighlight();
-    touchDrag.ghost.remove();
+    touchDrag.ghost?.remove();
+    const card = heroPool?.querySelector(`.hero-card[data-hero-id="${touchDrag.heroId}"]`);
+    if(card) card.style.removeProperty('opacity');
     touchDrag = null;
   });
 }
 
-// ─── URL STATE ─────────────────────────────────────────────────────────────────
-// Format: ?comp=3-0:chou,3-1:valir&blessed=3-0:K.O.F&gl1=chou&gl5=valir
-// Hanya menyimpan player-zone (rows >= PLAYER_ROW_START). replaceState dipakai
-// agar tombol Back browser tidak spam per-placement.
 function encodeToURL() {
   const params = new URLSearchParams();
   const comp = Object.entries(State.board)
@@ -1189,11 +1243,10 @@ function encodeToURL() {
 
 function decodeFromURL() {
   const params = new URLSearchParams(location.search);
-  if (!params.has('comp')) return;
+  if (!params.has('comp')) return false; // Return status
   let placed = 0;
   params.get('comp').split(',').forEach(entry => {
     const [pos, heroId] = entry.split(':');
-    // Validasi: pos harus format valid, heroId harus ada di HERO_DB
     if (pos && heroId && isValidPos(pos) && isValidHeroId(heroId)) {
       addHeroToBoard(heroId, pos); placed++;
     }
@@ -1204,8 +1257,6 @@ function decodeFromURL() {
       const bPos     = params.get('blessed').slice(0, colonIdx);
       const rawTrait = params.get('blessed').slice(colonIdx + 1);
       const trait    = decodeURIComponent(rawTrait || '');
-      // Validasi kritis: trait HARUS ada di ALL_TRAITS (whitelist dari HERO_DB)
-      // Ini mencegah XSS — string arbitrary dari URL tidak bisa masuk ke State
       if (isValidPos(bPos) && ALL_TRAITS.has(trait) && State.board[bPos]) {
         if (State.blessedPos && State.board[State.blessedPos]) {
           State.board[State.blessedPos].isBlessed    = false;
@@ -1214,24 +1265,64 @@ function decodeFromURL() {
         State.board[bPos].isBlessed    = true;
         State.board[bPos].blessedTrait = trait;
         State.blessedPos = bPos;
-        renderBoard(); updateSynergies();
       }
     }
   }
-  // GL dropdowns diisi setelah options sudah ada (initGloryLeagueDropdowns sudah dipanggil)
   requestAnimationFrame(() => {
     const gl1El = document.getElementById('gl-select-1g');
     const gl5El = document.getElementById('gl-select-5g');
     const gl1   = params.get('gl1');
     const gl5   = params.get('gl5');
-    // Validasi: value harus heroId yang valid
-    if (gl1El && gl1 && isValidHeroId(gl1)) { gl1El.value = gl1; updateSynergies(); }
-    if (gl5El && gl5 && isValidHeroId(gl5)) { gl5El.value = gl5; updateSynergies(); }
+    if (gl1El && gl1 && isValidHeroId(gl1)) { gl1El.value = gl1; }
+    if (gl5El && gl5 && isValidHeroId(gl5)) { gl5El.value = gl5; }
+    renderBoard(); 
+    updateSynergies();
   });
   if (placed > 0) showToast(`✓ ${placed} hero dimuat dari link!`, 'success');
+  return true; // Loaded from URL
 }
 
-// ─── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────────
+function loadInitialState() {
+  // Priority 1: Load from URL. If it succeeds, stop.
+  if (decodeFromURL()) {
+    return;
+  }
+
+  // Priority 2: Load from localStorage auto-save.
+  try {
+    const savedStateJSON = localStorage.getItem(AUTOSAVE_KEY);
+    if (savedStateJSON) {
+      const savedState = JSON.parse(savedStateJSON);
+      
+      if (savedState.board && typeof savedState.board === 'object') {
+        State.board = savedState.board;
+      }
+      if (savedState.blessedPos) {
+        State.blessedPos = savedState.blessedPos;
+      }
+      
+      renderBoard(); // Render the board with restored heroes
+
+      requestAnimationFrame(() => {
+        if (savedState.gl1) {
+            const gl1El = document.getElementById('gl-select-1g');
+            if (gl1El) gl1El.value = savedState.gl1;
+        }
+        if (savedState.gl5) {
+            const gl5El = document.getElementById('gl-select-5g');
+            if (gl5El) gl5El.value = savedState.gl5;
+        }
+        updateSynergies();
+        showToast('✓ Draft terakhir berhasil dipulihkan', 'success');
+      });
+    }
+  } catch (e) {
+    console.error('Gagal memuat state lineup:', e);
+    localStorage.removeItem(AUTOSAVE_KEY); // Clear potentially corrupted data
+  }
+}
+
+
 function initKeyboardShortcuts() {
   let helpEl = null;
 
@@ -1286,7 +1377,7 @@ function initKeyboardShortcuts() {
       s?.focus(); s?.select(); return;
     }
     if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !window.getSelection()?.toString()) {
-      e.preventDefault(); copyLineupToClipboard(); return;
+      e.preventDefault(); 
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if ('12345'.includes(e.key)) {
@@ -1300,14 +1391,12 @@ function initKeyboardShortcuts() {
       if (!Object.keys(State.board).length) { showToast('Board sudah kosong!', 'warn'); return; }
       State.board = {}; State.blessedPos = null;
       renderBoard(); updateSynergies();
+      renderHeroPool();
       showToast('Board direset.', 'info');
     }
   });
 }
 
-// ─── OG META (title + og:tags) ─────────────────────────────────────────────────
-// Catatan: og:image dinamis butuh SSR. Fungsi ini update <title> dan og:title/description
-// yang berguna untuk UX (tab name) dan crawler yang menjalankan JS (e.g. Googlebot).
 function initOGMeta() {
   function setMeta(prop, val, isName = false) {
     const attr = isName ? 'name' : 'property';
@@ -1334,15 +1423,11 @@ function initOGMeta() {
     setMeta('og:url', location.href);
     setMeta('twitter:title', title, true); setMeta('twitter:description', desc, true);
   }
-  // updateSynergies sudah memanggil encodeToURL yang refleksikan perubahan board;
-  // tapi OG perlu sumber sendiri karena update saat blessing/GL juga berubah.
-  // MutationObserver di sini aman: hanya observe childList (token masuk/keluar),
-  // bukan attributeOldValue/subtree style — tidak akan tembak saat boxShadow berubah.
+  
   const board = document.getElementById('chess-board');
   if (board) {
     let timeoutId = null;
     const mo = new MutationObserver(() => {
-      // Clear previous timeout to prevent race conditions
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         update();
@@ -1350,34 +1435,28 @@ function initOGMeta() {
       }, 150);
     });
     mo.observe(board, { childList: true });
-    // Store observer reference for cleanup if needed
     board._ogObserver = mo;
   }
   update();
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Inisialisasi Auth dan TUNGGU sampai selesai
   await initAuth();
   bindProfileEvents();
 
-  // 2. Cek apakah sesi sudah ada
   onAuthChange(session => {
     if (session) {
-      // Jika sudah login, baru render semua isi builder
       generateBoard();
       renderHeroPool();
       initGloryLeagueDropdowns();
       bindEvents();
       initTouchDnD();
-      updateSynergies();
-      decodeFromURL();
+      loadInitialState(); // <-- Replaced decodeFromURL with the new prioritized loader
       initKeyboardShortcuts();
       initOGMeta();
     } else {
-      // Jika belum, paksa login
       requireAuth(() => {
-          location.reload(); // Reload jika baru saja berhasil login
+          location.reload(); 
       }, 'untuk mengakses Lineup Builder');
     }
   });
