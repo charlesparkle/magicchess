@@ -549,6 +549,7 @@ body.page--builder {
         padding: 12px;
     }
     .hero-card {
+        max-width: 80px;
         max-width: 88px;
         justify-self: center;
     }
@@ -559,6 +560,7 @@ body.page--builder {
     body.page--builder { overflow: auto; }
     .arena__board { transform: rotateX(0deg) !important; }
     .hero-token   { transform: none !important; }
+    :root { --cell-size: clamp(44px, 13.2vw, 62px); }
     :root { --cell-size: clamp(42px, 12.8vw, 60px); }
 
     /* ── Bottom Nav Container ─────────────────────────────────── */
@@ -720,6 +722,20 @@ body.page--builder {
     .sidebar__link--active { width: 72px; }
 }
 
+@media (max-width: 640px) {
+    .content-header__title {
+        font-size: 18px;
+    }
+    .content-header__subtitle {
+        display: none;
+    }
+    .hero-card {
+        max-width: 74px;
+    }
+}
+
+@media (max-width: 520px) {
+    .hero-grid { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 520px) {
     .hero-grid { grid-template-columns: repeat(3, 1fr); }
 }

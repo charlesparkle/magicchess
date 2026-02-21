@@ -832,13 +832,15 @@ body.page--post {
 }
 
 @media (max-width: 640px) {
-    .content-header { 
-        gap: 10px; 
-        padding-top: 10px; 
+    .content-header {
+        gap: 10px;
+        padding-top: 10px;
         padding-bottom: 10px;
         flex-wrap: wrap;
+        min-height: 68px;
     }
-    .content-header__title { font-size: 20px; }
+    .content-header__title-group { min-width: 0; }
+    .content-header__title { font-size: 18px; line-height: 1.2; }
     .content-header__subtitle { display: none; }
     .content-header__actions {
         width: 100%;
