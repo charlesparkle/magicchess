@@ -72,23 +72,25 @@
             <header class="content-header">
                 <div class="content-header__title-group">
                     <h1 class="content-header__title">Lineup Builder</h1>
-                    <p class="content-header__subtitle">Season 5 · Mystic Meow Meta Engine</p>
+                    <p class="content-header__subtitle">Season 5 · Meta Engine</p>
                 </div>
                 <div class="content-header__stats">
                     <div class="stat-pill glass-panel">
                         <div class="stat-pill__item">
+                            <i class="ph-fill ph-coins" style="color:#eab308; font-size: 14px; margin-bottom: 2px;"></i>
                             <span class="stat-pill__label">GOLD</span>
                             <span class="stat-pill__value" id="total-gold" style="color:#eab308">0</span>
                         </div>
                         <div class="stat-pill__divider"></div>
                         <div class="stat-pill__item">
+                            <i class="ph-fill ph-users" style="color:#6366f1; font-size: 14px; margin-bottom: 2px;"></i>
                             <span class="stat-pill__label">SLOTS</span>
                             <span class="stat-pill__value" id="population-count">0/10</span>
                         </div>
                     </div>
                     <button class="btn btn--primary" id="share-lineup" title="Salin lineup ke clipboard">
                         <i class="ph-bold ph-copy"></i>
-                        <span>Salin Lineup</span>
+                        <span>Salin</span>
                     </button>
                 </div>
             </header>
@@ -119,7 +121,7 @@
                 <section class="panel panel--center" aria-label="Battle Board">
                     <div class="arena">
                         <div class="zone-label zone-label--enemy">
-                            <i class="ph-bold ph-skull"></i> Area Lawan
+                            <i class="ph-bold ph-skull"></i> Lawan
                         </div>
                         <div class="arena__board" id="chess-board"></div>
                         <div class="zone-label zone-label--player">
@@ -166,13 +168,6 @@
                                 <select id="gl-select-5g" class="gl-select"></select>
                             </div>
                             <p class="gl-hint">Jika hero terpilih ada di board, +1 poin Glory League ditambahkan.</p>
-                        </div>
-                        <div class="meow-status" id="meow-indicator">
-                            <div class="meow-status__icon">🐱</div>
-                            <div class="meow-status__info">
-                                <span class="meow-status__title">Mystic Meow</span>
-                                <span class="meow-status__desc">Tidak aktif (0/9 tipe trait aktif)</span>
-                            </div>
                         </div>
                     </div>
                 </section>
