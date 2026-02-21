@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0d0f">
     <title>Community Hub | MCGG Network</title>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
     <link rel="stylesheet" href="tokens.css">
     <link rel="stylesheet" href="layout.css">
     <link rel="stylesheet" href="style.css">
@@ -21,48 +26,50 @@
 
     <div class="app-shell">
 
-        <aside class="sidebar" role="navigation" aria-label="Side Navigation">
-            <a href="index.html" class="sidebar__logo" aria-label="Go to Home">
+        <aside class="sidebar" role="navigation" aria-label="Navigasi Utama">
+            <a href="index.html" class="sidebar__logo" aria-label="Beranda">
                 <div class="sidebar__logo-icon"><i class="ph-fill ph-hexagon"></i></div>
             </a>
+            
             <nav class="sidebar__nav">
-                <ul class="sidebar__list">
-                    <li class="sidebar__item">
-                        <a href="builder.html" class="sidebar__link" title="Lineup Builder">
+                <ul class="sidebar__list" role="menubar">
+                    <li class="sidebar__item" role="none">
+                        <a href="builder.html" class="sidebar__link" role="menuitem" title="Lineup Builder">
                             <i class="ph-bold ph-wrench"></i>
                             <span class="sidebar__label">Builder</span>
                         </a>
                     </li>
-                    <li class="sidebar__item">
-                        <a href="app.html" class="sidebar__link sidebar__link--active" title="Community Hub">
+                    <li class="sidebar__item" role="none">
+                        <a href="app.html" class="sidebar__link sidebar__link--active" role="menuitem" aria-current="page" title="Community Hub">
                             <i class="ph-bold ph-users-three"></i>
                             <span class="sidebar__label">Community</span>
-                            <span class="sidebar__badge" aria-label="5 new notifications">5</span>
+                            <span class="sidebar__badge" aria-label="5 notifikasi baru">5</span>
                         </a>
                     </li>
-                    <li class="sidebar__item">
-                        <a href="#" class="sidebar__link" title="Meta Tier List">
+                    <li class="sidebar__item" role="none">
+                        <a href="#" class="sidebar__link" role="menuitem" title="Meta Tier List">
                             <i class="ph-bold ph-chart-line-up"></i>
                             <span class="sidebar__label">Meta</span>
                         </a>
                     </li>
-                    <li class="sidebar__item">
-                        <a href="#" class="sidebar__link" title="Tournament Brackets">
+                    <li class="sidebar__item" role="none">
+                        <a href="#" class="sidebar__link" role="menuitem" title="Tournament Brackets">
                             <i class="ph-bold ph-trophy"></i>
                             <span class="sidebar__label">Tourney</span>
                         </a>
                     </li>
                 </ul>
             </nav>
+
             <div class="sidebar__footer">
-                <button class="sidebar__action" aria-label="Settings"><i class="ph-bold ph-gear"></i></button>
-                <button id="sidebar-logout-btn" hidden aria-label="Logout"><i class="ph-bold ph-sign-out"></i></button>
-                <button id="sidebar-login-btn" aria-label="Login">
+                <button class="sidebar__action" aria-label="Pengaturan"><i class="ph-bold ph-gear"></i></button>
+                <button id="sidebar-logout-btn" hidden aria-label="Keluar"><i class="ph-bold ph-sign-out"></i></button>
+                <button id="sidebar-login-btn" aria-label="Masuk">
                     <i class="ph-bold ph-sign-in"></i>
                     <span>Login</span>
                 </button>
                 <div class="sidebar__user">
-                    <img src="https://ui-avatars.com/api/?name=Guest&background=27272a&color=71717a" alt="User Profile" class="sidebar__avatar">
+                    <img src="https://ui-avatars.com/api/?name=Guest&background=27272a&color=71717a" alt="Profil Pengguna" class="sidebar__avatar" loading="lazy">
                 </div>
             </div>
         </aside>
@@ -74,12 +81,15 @@
                     <h1 class="content-header__title">Community Hub</h1>
                     <p class="content-header__subtitle">Trending discussions and global meta insights</p>
                 </div>
+                
                 <div class="content-header__actions">
-                    <div class="search-field">
-                        <i class="ph-bold ph-magnifying-glass"></i>
-                        <input type="text" placeholder="Search discussions..." aria-label="Search forum">
-                    </div>
-                    <button class="btn btn--primary icon-left" id="open-create-post">
+                    <form class="search-field" action="#" role="search">
+                        <label for="search-forum" class="sr-only" style="display:none;">Cari diskusi</label>
+                        <i class="ph-bold ph-magnifying-glass" aria-hidden="true"></i>
+                        <input type="search" id="search-forum" placeholder="Search discussions..." aria-label="Search forum" enterkeyhint="search">
+                    </form>
+                    
+                    <button class="btn btn--primary icon-left" id="open-create-post" aria-haspopup="dialog" aria-controls="create-post-modal">
                         <i class="ph-bold ph-plus"></i>
                         <span>Create Post</span>
                     </button>
@@ -89,15 +99,17 @@
             <div class="layout-grid">
 
                 <section class="feed" aria-label="Discussion Feed">
-                    <nav class="feed__filters" aria-label="Feed category">
-                        <div class="feed__tabs">
-                            <button class="feed__filter feed__filter--active" data-tab="recent">Recent</button>
-                            <button class="feed__filter" data-tab="news">
+                    <nav class="feed__filters" aria-label="Filter Feed">
+                        <div class="feed__tabs" role="tablist">
+                            <button class="feed__filter feed__filter--active" role="tab" aria-selected="true" data-tab="recent">Recent</button>
+                            <button class="feed__filter" role="tab" aria-selected="false" data-tab="news">
                                 <i class="ph-bold ph-newspaper"></i> News
                             </button>
                         </div>
+                        
                         <div class="feed__sort-wrap">
-                            <select class="feed__sort" id="feed-sort" aria-label="Urutkan">
+                            <label for="feed-sort" class="sr-only" style="display:none;">Urutkan Feed</label>
+                            <select class="feed__sort" id="feed-sort" aria-label="Urutkan postingan">
                                 <option value="new">🕐 Terbaru</option>
                                 <option value="top">⭐ Terpopuler</option>
                                 <option value="hot">🔥 Hot</option>
@@ -105,42 +117,59 @@
                             </select>
                         </div>
                     </nav>
-                    <div class="feed__container custom-scroll"></div>
+
+                    <div class="feed__container custom-scroll" aria-live="polite">
+                        <div class="post post--skeleton" aria-hidden="true" style="opacity: 0.5; pointer-events: none;">
+                            <div class="post__header">
+                                <div class="post__user">
+                                    <div class="post__avatar" style="background:#27272a;"></div>
+                                    <div class="post__user-info">
+                                        <div style="height:12px; width:100px; background:#27272a; border-radius:4px; margin-bottom:4px;"></div>
+                                        <div style="height:10px; width:60px; background:#27272a; border-radius:4px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="height:18px; width:80%; background:#27272a; border-radius:4px; margin: 12px 0;"></div>
+                            <div style="height:14px; width:100%; background:#27272a; border-radius:4px; margin-bottom: 6px;"></div>
+                            <div style="height:14px; width:60%; background:#27272a; border-radius:4px;"></div>
+                        </div>
+                        </div>
                 </section>
 
                 <aside class="side-panel" aria-label="Community Statistics">
                     <section class="widget widget--live glass-panel">
                         <header class="widget__header">
                             <h3 class="widget__title">Live Tournament</h3>
-                            <span class="status-indicator"></span>
+                            <span class="status-indicator" aria-label="Sedang Berlangsung"></span>
                         </header>
                         <div class="widget__content">
                             <h4 class="tournament-name">Rising Star S2</h4>
                             <p class="tournament-match">Grand Finals: Team ONIC vs RRQ</p>
-                            <div class="tournament-timer">
-                                <div class="timer-unit"><span id="timer-h">02</span><small>h</small></div>
-                                <div class="timer-unit"><span id="timer-m">45</span><small>m</small></div>
-                                <div class="timer-unit"><span id="timer-s">12</span><small>s</small></div>
+                            <div class="tournament-timer" aria-label="Waktu tersisa: 2 jam 45 menit 12 detik">
+                                <div class="timer-unit" aria-hidden="true"><span id="timer-h">02</span><small>h</small></div>
+                                <div class="timer-unit" aria-hidden="true"><span id="timer-m">45</span><small>m</small></div>
+                                <div class="timer-unit" aria-hidden="true"><span id="timer-s">12</span><small>s</small></div>
                             </div>
                             <button class="btn btn--white btn--block">Watch Live</button>
                         </div>
                     </section>
+                    
                     <section class="widget glass-panel">
                         <header class="widget__header">
                             <h3 class="widget__title">Global Rankings</h3>
                         </header>
-                        <div class="leaderboard">
-                            <div class="leaderboard__row">
+                        <div class="leaderboard" role="list">
+                            <div class="leaderboard__row" role="listitem">
                                 <span class="leaderboard__rank">1</span>
                                 <span class="leaderboard__name">R7 Tatsumaki</span>
                                 <span class="leaderboard__pts">2450</span>
                             </div>
-                            <div class="leaderboard__row">
+                            <div class="leaderboard__row" role="listitem">
                                 <span class="leaderboard__rank">2</span>
                                 <span class="leaderboard__name">Lemon</span>
                                 <span class="leaderboard__pts">2410</span>
                             </div>
-                            <div class="leaderboard__row">
+                            <div class="leaderboard__row" role="listitem">
                                 <span class="leaderboard__rank">3</span>
                                 <span class="leaderboard__name">Kairi</span>
                                 <span class="leaderboard__pts">2380</span>
@@ -152,61 +181,56 @@
         </main>
     </div>
 
-    <!-- ── MODAL: Create Post (Composer) ────────────────────────── -->
-    <div id="create-post-modal" class="cp-overlay" role="dialog" aria-modal="true" aria-label="Buat Postingan" hidden>
+    <div id="create-post-modal" class="cp-overlay" role="dialog" aria-modal="true" aria-labelledby="cp-head-title" hidden>
         <div class="cp-composer">
 
-            <!-- Header: avatar + name + close -->
             <div class="cp-head">
                 <div class="cp-head__identity">
-                    <div class="cp-avatar" id="cp-avatar"></div>
+                    <div class="cp-avatar" id="cp-avatar" aria-hidden="true"></div>
                     <div class="cp-head__meta">
                         <span class="cp-head__name" id="cp-username-label">—</span>
-                        <span class="cp-head__sub">posting ke komunitas</span>
+                        <span class="cp-head__sub" id="cp-head-title">posting ke komunitas</span>
                     </div>
                 </div>
-                <button class="cp-close" id="cp-close" aria-label="Tutup"><i class="ph-bold ph-x"></i></button>
+                <button class="cp-close" id="cp-close" aria-label="Tutup modal"><i class="ph-bold ph-x"></i></button>
             </div>
 
-            <!-- Category pills -->
-            <div class="cp-cats" id="cp-cats">
+            <div class="cp-cats" id="cp-cats" role="radiogroup" aria-label="Kategori Postingan">
                 <span class="cp-cats__label">Kategori</span>
-                <button type="button" class="cp-cat" data-category="guide" data-tag="Guide">
+                <button type="button" class="cp-cat" role="radio" aria-checked="false" data-category="guide" data-tag="Guide">
                     <i class="ph-bold ph-book-open"></i> Guide
                 </button>
-                <button type="button" class="cp-cat" data-category="meta" data-tag="Meta Discussion">
+                <button type="button" class="cp-cat" role="radio" aria-checked="false" data-category="meta" data-tag="Meta Discussion">
                     <i class="ph-bold ph-chart-line-up"></i> Meta
                 </button>
-                <button type="button" class="cp-cat cp-cat--news-only" data-category="news" data-tag="News" style="display:none">
+                <button type="button" class="cp-cat cp-cat--news-only" role="radio" aria-checked="false" data-category="news" data-tag="News" style="display:none">
                     <i class="ph-bold ph-newspaper"></i> News
                 </button>
-                <span class="cp-cat-err" id="cp-error-category" hidden>← pilih dulu</span>
+                <span class="cp-cat-err" id="cp-error-category" role="alert" hidden>← pilih dulu</span>
             </div>
 
-            <!-- Scrollable body: compose view OR preview view -->
             <div class="cp-body" id="cp-body-wrap">
-
-                <!-- COMPOSE -->
                 <div id="cp-compose-view">
+                    <label for="cp-text" class="sr-only" style="display:none;">Isi postingan</label>
                     <textarea
                         id="cp-text"
                         class="cp-textarea"
                         placeholder="Tulis postinganmu… share strategi, meta, guide, diskusi seru seputar Magic Chess 🎮"
                         maxlength="5000"
+                        aria-describedby="cp-char-count cp-error-text"
                     ></textarea>
-                    <p class="cp-text-err" id="cp-error-text" hidden>Tulis minimal 10 karakter dulu.</p>
+                    <p class="cp-text-err" id="cp-error-text" role="alert" hidden>Tulis minimal 10 karakter dulu.</p>
 
-                    <!-- Attachment toolbar -->
                     <div class="cp-toolbar">
-                        <label class="cp-tool" title="Gambar (JPG/PNG/GIF/WEBP, maks 10 MB)">
+                        <label class="cp-tool" title="Gambar (JPG/PNG/GIF/WEBP, maks 10 MB)" tabindex="0" role="button">
                             <input type="file" id="cp-img-input" accept="image/jpeg,image/png,image/gif,image/webp,image/avif" multiple hidden>
                             <i class="ph-bold ph-image"></i>
                         </label>
-                        <label class="cp-tool" title="Video (MP4/WEBM, maks 100 MB)">
+                        <label class="cp-tool" title="Video (MP4/WEBM, maks 100 MB)" tabindex="0" role="button">
                             <input type="file" id="cp-vid-input" accept="video/mp4,video/webm,video/ogg" hidden>
                             <i class="ph-bold ph-video-camera"></i>
                         </label>
-                        <label class="cp-tool" title="PDF (maks 20 MB)">
+                        <label class="cp-tool" title="PDF (maks 20 MB)" tabindex="0" role="button">
                             <input type="file" id="cp-pdf-input" accept="application/pdf" hidden>
                             <i class="ph-bold ph-file-pdf"></i>
                         </label>
@@ -214,32 +238,27 @@
                             <i class="ph-bold ph-link"></i>
                         </button>
                         <span class="cp-toolbar__sep"></span>
-                        <span class="cp-char-count" id="cp-char-count">0 / 5000</span>
+                        <span class="cp-char-count" id="cp-char-count" aria-live="polite">0 / 5000</span>
                     </div>
 
-                    <!-- Link input (hidden by default) -->
                     <div class="cp-link-wrap" id="cp-link-wrap" hidden>
-                        <i class="ph-bold ph-link"></i>
-                        <input type="url" id="cp-link-input" placeholder="https://..." autocomplete="off">
-                        <button type="button" id="cp-link-clear" aria-label="Hapus"><i class="ph-bold ph-x"></i></button>
+                        <i class="ph-bold ph-link" aria-hidden="true"></i>
+                        <input type="url" id="cp-link-input" placeholder="https://..." autocomplete="off" aria-label="URL Tautan">
+                        <button type="button" id="cp-link-clear" aria-label="Hapus tautan"><i class="ph-bold ph-x"></i></button>
                     </div>
-                    <p class="cp-link-err" id="cp-link-err" hidden></p>
+                    <p class="cp-link-err" id="cp-link-err" role="alert" hidden></p>
 
-                    <!-- Media thumbnails -->
-                    <div class="cp-media-row" id="cp-media-row"></div>
+                    <div class="cp-media-row" id="cp-media-row" aria-live="polite"></div>
                 </div>
 
-                <!-- PREVIEW -->
-                <div id="cp-preview-view" hidden>
+                <div id="cp-preview-view" hidden aria-live="polite">
                     <p class="cp-preview-label"><i class="ph-bold ph-eye"></i> Tampilan di feed</p>
                     <div id="cp-preview-card"></div>
                 </div>
-
             </div>
 
-            <!-- Footer -->
             <div class="cp-foot">
-                <button class="cp-preview-btn" id="cp-preview-toggle">
+                <button class="cp-preview-btn" id="cp-preview-toggle" aria-pressed="false">
                     <i class="ph-bold ph-eye" id="cp-preview-icon"></i>
                     <span id="cp-preview-btn-label">Preview</span>
                 </button>
@@ -254,17 +273,14 @@
         </div>
     </div>
 
-    <script type="module" src="app.js"></script>
-
-    <!-- FAB: Profile — kanan atas, muncul di mobile saat login -->
     <button id="fab-profile" aria-label="Profil saya">
-        <img src="https://ui-avatars.com/api/?name=Guest&background=27272a&color=71717a"
-             alt="Avatar" id="fab-profile-img">
+        <img src="https://ui-avatars.com/api/?name=Guest&background=27272a&color=71717a" alt="Avatar Profil" id="fab-profile-img" loading="lazy">
     </button>
 
-    <!-- FAB: Create Post pensil — kiri bawah, muncul di mobile -->
-    <button id="fab-create-post" aria-label="Buat postingan">
+    <button id="fab-create-post" aria-label="Buat postingan baru" aria-haspopup="dialog" aria-controls="create-post-modal">
         <i class="ph-bold ph-pencil-simple"></i>
     </button>
+
+    <script type="module" src="app.js"></script>
 </body>
 </html>
