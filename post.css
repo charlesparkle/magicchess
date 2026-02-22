@@ -454,87 +454,19 @@
     outline-color: transparent;
     background: transparent;
 }
-/* ══════════════════════════════════════════════════════════════
-   MOBILE & RESPONSIVE QUERIES (UPDATED FOR POST PAGE)
-   ══════════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
     .post-layout { grid-template-columns: 1fr; }
     .post-sidebar { display: none; }
     .main-content--post {
-        /* Disamakan dengan app.css agar selaras */
-        padding: 0 16px calc(90px + env(safe-area-inset-bottom, 12px) + 16px);
+        padding: 0 20px calc(80px + env(safe-area-inset-bottom, 12px) + 16px);
     }
 }
 
 @media (max-width: 640px) {
-    /* 1. Mencegah Link/Teks Panjang Tembus Layar */
-    .article-body, .comment-item__text, .breadcrumb__item--active {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        white-space: normal;
-    }
-
-    /* 2. Fix Header agar tidak kaku */
-    .content-header--post {
-        height: auto;
-        min-height: 60px;
-        padding: 12px 0;
-        gap: 12px;
-    }
-    .back-btn { padding: 8px 12px; }
-    .back-btn span { display: none; } /* Sisakan icon saja */
-    .breadcrumb { font-size: 11px; }
-
-    /* 3. Tipografi Artikel */
-    .article-title { 
-        font-size: 22px; 
-        margin-bottom: 16px; 
-    }
-    .article-body blockquote { 
-        padding: 10px 14px; 
-        margin: 16px 0; 
-    }
-
-    /* 4. Fix Author Bar (Profil & Tombol Vote/Share) */
-    .author-bar { 
-        flex-wrap: wrap; 
-        padding: 14px 16px; /* Kurangi padding agar tidak makan tempat */
-        gap: 14px; 
-        margin-bottom: 24px;
-    }
-    .author-bar__actions { 
-        width: 100%; 
-        margin-top: 2px; /* Jarak antara profil dan tombol */
-    }
-    .vote-btn, .share-btn { 
-        flex: 1; 
-        justify-content: center; 
-    }
-
-    /* 5. Fix Form & List Komentar agar tidak sumpek */
-    .comment-form {
-        padding: 12px;
-        gap: 10px;
-    }
-    .comment-form__avatar { 
-        width: 32px; 
-        height: 32px; 
-        font-size: 11px; 
-    }
-    .comment-item { 
-        gap: 10px; 
-        padding: 14px 0; 
-    }
-    .comment-item__avatar { 
-        width: 32px; 
-        height: 32px; 
-    }
-}
-
-@media (max-width: 400px) {
-    /* Tweaks tambahan untuk layar HP yang sangat kecil (iPhone SE, dll) */
-    .article-title { font-size: 20px; }
-    .vote-btn, .share-btn { font-size: 12px; padding: 8px 10px; }
-    .comment-form__footer { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .comment-form__footer .btn--sm { width: 100%; justify-content: center; }
+    .article-title { font-size: 22px; }
+    .author-bar { flex-wrap: wrap; }
+    .author-bar__actions { width: 100%; }
+    .vote-btn, .share-btn { flex: 1; justify-content: center; }
+    .content-header--post { gap: 12px; }
+    .back-btn span { display: none; } /* Hanya icon di mobile */
 }
